@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +13,10 @@ use App\Http\Controllers\Auth\LoginController;
 |
 */
 
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+}); */
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,20 +26,10 @@ Route::get('/', function () {
     return view('home');
 });
 
-/* Route::get('/register', function () {
+Route::get('/register', function () {
     return view('register');
 });
 
 Route::get('/login', function () {
     return view('login');
 });
- */
-
-// Rutas de autenticación para login y registro
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/login', [LoginController::class, 'login']);
-
- Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
