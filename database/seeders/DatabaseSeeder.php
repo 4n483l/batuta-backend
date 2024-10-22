@@ -14,5 +14,12 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
+        \App\Models\Concerts::factory(10)->create();
+
+
+        //crea datos a nivel memoria sin guardar en sql
+        \App\Models\User::factory(10)->make();
+        // \App\Models\Concerts::factory(10)->make();
+
     }
 }
