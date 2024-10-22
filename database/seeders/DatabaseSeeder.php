@@ -15,11 +15,15 @@ class DatabaseSeeder extends Seeder
     {
          \App\Models\User::factory(10)->create();
         \App\Models\Concerts::factory(10)->create();
+        \App\Models\Rehearsals::factory(10)->create();
+        \App\Models\Classes::factory(10)->create();
 
 
         //crea datos a nivel memoria sin guardar en sql
-      //  \App\Models\User::factory(10)->make();
+        //  \App\Models\User::factory(10)->make();
         // \App\Models\Concerts::factory(10)->make();
+        // \App\Models\Rehearsals::factory(10)->make();
+        // \App\Models\Classes::factory(10)->make();
 
     }
 }

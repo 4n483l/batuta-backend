@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ConcertsController;
+use App\Http\Controllers\RehearsalsController;
+use App\Http\Controllers\ClassesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,14 +21,14 @@ use App\Http\Controllers\ConcertsController;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
-Route::get('/concerts', [ConcertsController::class, 'index']);
-
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-/* Route::middleware('auth:sanctum')->get('/dashboard', function () {
-    return response()->json(['message' => 'Bienvenido al dashboard']);
-});
- */
+
+Route::get('/concerts', [ConcertsController::class, 'index']);
+Route::get('/rehearsals', [RehearsalsController::class, 'index']);
+Route::get('/classes', [ClassesController::class, 'index']);
+
+
