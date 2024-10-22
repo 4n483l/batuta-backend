@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\Concerts::factory(10)->create();
         \App\Models\Rehearsals::factory(10)->create();
         \App\Models\Classes::factory(10)->create();
+         \App\Models\Exams::factory(10)->create();
+         \App\Models\Notes::factory(10)->create();
 
 
         //crea datos a nivel memoria sin guardar en sql
@@ -24,6 +26,8 @@ class DatabaseSeeder extends Seeder
         // \App\Models\Concerts::factory(10)->make();
         // \App\Models\Rehearsals::factory(10)->make();
         // \App\Models\Classes::factory(10)->make();
+         //\App\Models\Exams::factory(10)->make();
+        // \App\Models\Notes::factory(10)->make();
 
     }
 }
