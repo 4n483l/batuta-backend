@@ -12,7 +12,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public function Users()
+    public function subjects()
     {
         return $this->hasMany(Subjects::class);
     }
