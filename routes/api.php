@@ -33,8 +33,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/concerts', [ConcertsController::class, 'index']);
 Route::get('/rehearsals', [RehearsalsController::class, 'index']);
-Route::get('/classes', [ClassesController::class, 'index']);
+
+/* Route::get('/classes', [ClassesController::class, 'index']);
 Route::get('/exams', [ExamsController::class, 'index']);
 Route::get('/notes', [NotesController::class, 'index']);
-
+ */
 

@@ -15,7 +15,7 @@ class CreateConcertsTable extends Migration
     {
         Schema::create('concerts', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('title');
             $table->string('place');
             $table->date('date');
             $table->string('hour');
