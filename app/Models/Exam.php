@@ -11,13 +11,13 @@ class Exam extends Model
 
     protected $fillable = ['date', 'time', 'subject_id', 'user_id'];
 
-    // Relación con la asignatura
+    // Un examen pertenece a una asignatura
     public function subject()
     {
         return $this->belongsTo(Subject::class);
     }
 
-    // Relación con el profesor que creó el examen
+    // Un examen lo realiza un profesor
     public function user()
     {
         return $this->belongsTo(User::class);
