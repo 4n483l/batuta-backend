@@ -17,8 +17,8 @@ class CreateExamsTable extends Migration
             $table->id();
             $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Relación con la asignatura
             $table->foreignId('user_id')->constrained()->onDelete('cascade');    // Profesor que programa el examen
-            $table->date('date');   // Fecha del examen
-            $table->time('time');   // Hora del examen
+            $table->date('date');
+            $table->string('hour');   
             $table->string('classroom')->nullable(); // Aula donde se realizará el examen (opcional)
             $table->timestamps();
         });

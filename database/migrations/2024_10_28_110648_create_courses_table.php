@@ -18,7 +18,7 @@ class CreateCoursesTable extends Migration
             $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Asignatura de la clase
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Profesor que imparte la clase
             $table->date('date'); // Fecha de la clase
-            $table->time('time'); // Hora de la clase
+            $table->string('hour'); // Hora de la clase
             $table->string('classroom')->nullable(); // Aula (opcional)
             $table->timestamps();
         });

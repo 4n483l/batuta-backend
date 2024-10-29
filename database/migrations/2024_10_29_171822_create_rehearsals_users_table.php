@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNotesTable extends Migration
+class CreateRehearsalsUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,14 +12,11 @@ class CreateNotesTable extends Migration
      * @return void
      */
     public function up()
-    { // apuntes de clase
-        Schema::create('notes', function (Blueprint $table) {
+    {
+        Schema::create('rehearsals_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con el usuario
-            $table->string('title');
-            $table->string('topic');
-            $table->text('content');
-            $table->string('subject');
+            $table->foreignId('rehearsal_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateNotesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notes');
+        Schema::dropIfExists('rehearsals_users');
     }
 }

@@ -12,7 +12,7 @@ class Subject extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'subject_user', 'subject_id', 'user_id')
-            ->withPivot('role')  // Para diferenciar si un usuario es alumno o profesor en esta asignatura
+            ->withPivot('user_type')  // Para diferenciar si un usuario es alumno o profesor en esta asignatura
             ->withTimestamps();
     }
     // Un profesor sube varios apuntes

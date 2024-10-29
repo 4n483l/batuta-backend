@@ -17,7 +17,7 @@ class CreateSubjectUserTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->string('role'); // student, teacher, admin
+            $table->string('user_type'); // student, teacher, musician
             $table->timestamps();
         });
     }

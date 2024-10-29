@@ -3,11 +3,13 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Exams;
+use App\Models\Course;
+use App\Models\Subject;
+use App\Models\User;
 
-class ExamsFactory extends Factory
+class CourseFactory extends Factory
 {
-    protected $model = Exams::class;
+    protected $model = Course::class;
     /**
      * Define the model's default state.
      *
@@ -16,8 +18,9 @@ class ExamsFactory extends Factory
     public function definition()
     {
         return [
-            'subject' => $this->faker->word,
-            'teacher' => $this->faker->name,
+
+           'subject_id' => Subject::factory(),
+            'user_id' => User::factory(),
             'classroom' => $this->faker->word,
             'date' => $this->faker->date,
             'hour' => $this->faker->time,

@@ -14,20 +14,22 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
          \App\Models\User::factory(10)->create();
-        \App\Models\Concerts::factory(10)->create();
-        \App\Models\Rehearsals::factory(10)->create();
-        \App\Models\Classes::factory(10)->create();
-         \App\Models\Exams::factory(10)->create();
-         \App\Models\Notes::factory(10)->create();
+        \App\Models\Subject::factory(10)->create();
+
+        \App\Models\Concert::factory(10)->create();
+        \App\Models\Rehearsal::factory(10)->create();
+        \App\Models\Course::factory(10)->create();
+         \App\Models\Exam::factory(10)->create();
+         \App\Models\Note::factory(10)->create();
 
 
         //crea datos a nivel memoria sin guardar en sql
         //  \App\Models\User::factory(10)->make();
-        // \App\Models\Concerts::factory(10)->make();
-        // \App\Models\Rehearsals::factory(10)->make();
-        // \App\Models\Classes::factory(10)->make();
-         //\App\Models\Exams::factory(10)->make();
-        // \App\Models\Notes::factory(10)->make();
+        // \App\Models\Concert::factory(10)->make();
+        // \App\Models\Rehearsal::factory(10)->make();
+        // \App\Models\Course::factory(10)->make();
+         //\App\Models\Exam::factory(10)->make();
+        // \App\Models\Note::factory(10)->make();
 
     }
 }

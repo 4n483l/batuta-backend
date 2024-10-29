@@ -49,7 +49,7 @@ class User extends Authenticatable
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_user', 'user_id', 'subject_id')
-            ->withPivot('role')  // Almacenar si el usuario es profesor o alumno en la asignatura
+            ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
             ->withTimestamps();
     }
 
@@ -66,9 +66,15 @@ class User extends Authenticatable
     }
 
     // Un profesor imparte varias clases
-    public function courses() {
+    public function courses()
+    {
         return $this->hasMany(Course::class);
     }
 
-    
+    public function rehearsals()
+    {
+        return $this->belongsToMany(Rehearsal::class, 'rehearsal_user', 'user_id', 'rehearsal_id')
+            ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
+            ->withTimestamps();
+    }
 }

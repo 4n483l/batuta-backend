@@ -3,12 +3,11 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Concerts;
+use App\Models\Rehearsal;
 
-class ConcertsFactory extends Factory
+class RehearsalFactory extends Factory
 {
-    protected $model = Concerts::class;
-    
+    protected $model = Rehearsal::class;
     /**
      * Define the model's default state.
      *
@@ -17,8 +16,7 @@ class ConcertsFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
-            'place' => $this->faker->city,
+            'place' => $this->faker->randomElement(['auditorium', 'rehearsal room']),
             'date' => $this->faker->date,
             'hour' => $this->faker->time,
         ];
