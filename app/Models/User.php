@@ -77,4 +77,11 @@ class User extends Authenticatable
             ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
             ->withTimestamps();
     }
+
+    public function concerts()
+    {
+        return $this->belongsToMany(Concert::class, 'concert_user', 'user_id', 'concert_id')
+            ->withPivot('user_type')  
+            ->withTimestamps();
+    }
 }
