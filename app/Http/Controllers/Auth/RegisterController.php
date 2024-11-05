@@ -15,19 +15,40 @@ class RegisterController extends Controller
         // Validación de los datos de entrada
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'phone' => 'required|regex:/^(\+?[0-9]{1,3})?[-. ]?\(?[0-9]{3}\)?[-. ]?[0-9]{3}[-. ]?[0-9]{3,4}$/', // Formato de teléfono internacional flexible
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'string|in:admin,user',
+            'user_type' => 'string|in:student,teacher,musician,member',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
+   /*      PENDIENTE DE COMPROBAR
+   if ($request->role == 'member') {
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                $user->update([
+                    'role' => 'user',
+                    'user_type' => 'student',
+                ]);
+            }
+        } */
+
+
+
         // Creación del nuevo usuario
         $user = User::create([
             'name' => $request->name,
+            'lastname' => $request->lastname,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'user',
+            'user_type' => $request->user_type ?? 'student',
         ]);
 
         return response()->json(['message' => 'Usuario registrado satisfactoriamente!', 'user' => $user], 201);
