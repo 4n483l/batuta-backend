@@ -20,6 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'lastname',
+        'dni',
+        'phone',
         'email',
         'password',
         'role',
@@ -43,6 +46,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function children()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function parent()
+    {
+        return $this->hasMany(User::class, 'user_id');
+    }
 
     // belongsTo es para muchos a muchos
     // Un profesor enseña muchas asignaturas, y un alumno se matricula en varias asignaturas
@@ -81,7 +94,7 @@ class User extends Authenticatable
     public function concerts()
     {
         return $this->belongsToMany(Concert::class, 'concert_user', 'user_id', 'concert_id')
-            ->withPivot('user_type')  
+            ->withPivot('user_type')
             ->withTimestamps();
     }
 }

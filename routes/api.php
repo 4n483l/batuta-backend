@@ -25,10 +25,13 @@ use App\Http\Controllers\NotesController;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
+Route::post('/tuitions', [TuitionsController::class, 'store']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Route::get('/tuitions', [TuitionsController::class, 'show']);
 
 
 Route::get('/concerts', [ConcertsController::class, 'index']);

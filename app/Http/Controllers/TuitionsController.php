@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Tuition;
+use Illuminate\Support\Facades\Auth;
 
 class TuitionsController extends Controller
 {
@@ -11,15 +12,26 @@ class TuitionsController extends Controller
     {
         // Validamos los datos del formulario
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+          //  'first_name' => 'required|string|max:255',
+          //  'last_name' => 'required|string|max:255',
             'birth_date' => 'required|date',
             'address' => 'required|string|max:255',
-            'email' => 'required|email|unique:tuitions,email',
-            'phone_number' => 'required|string|max:20',
+          //  'email' => 'required|email|unique:tuitions,email',
+          //  'phone' => 'required|string|max:20',
             'subjects' => 'required|array', // Validamos que sea un array
             'subjects.*' => 'string', // Cada asignatura debe ser una cadena de texto
         ]);
+
+           /*      PENDIENTE DE COMPROBAR
+   if ($request->role == 'member') {
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                $user->update([
+                    'role' => 'user',
+                    'user_type' => 'student',
+                ]);
+            }
+        } */
 
         // Creamos un nuevo registro en la tabla `tuitions`
         Tuition::create([
@@ -28,10 +40,17 @@ class TuitionsController extends Controller
             'birth_date' => $validatedData['birth_date'],
             'address' => $validatedData['address'],
             'email' => $validatedData['email'],
-            'phone_number' => $validatedData['phone_number'],
+            'phone' => $validatedData['phone'],
             'subjects' => json_encode($validatedData['subjects']), // Convertimos el array a JSON
         ]);
 
         return response()->json(['message' => 'Matrícula creada exitosamente.']);
+    }
+
+    public function show()
+    {
+        // Obtenemos los datos del usuario actualmente autenticado
+        $user = Auth::user();
+        return response()->json( ['message' => 'Usuario actual.', $user]);
     }
 }

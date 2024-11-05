@@ -17,13 +17,15 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'lastname' => $this->faker->lastName(),
+            'dni' => $this->faker->unique()->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->unique()->phoneNumber(),
             'role' => $this->faker->randomElement(['admin', 'user']),
-            'user_type' => $this->faker->randomElement(['student', 'teacher', 'musician']),
+            'user_type' => $this->faker->randomElement(['student', 'teacher', 'musician', 'member']),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
+            'user_id' => $this->faker->numberBetween(0, 5),
         ];
     }
 

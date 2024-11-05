@@ -16,6 +16,7 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
+            'dni' => 'required|string|max:255|unique:users',
             'phone' => 'required|regex:/^(\+?[0-9]{1,3})?[-. ]?\(?[0-9]{3}\)?[-. ]?[0-9]{3}[-. ]?[0-9]{3,4}$/', // Formato de teléfono internacional flexible
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
@@ -27,23 +28,13 @@ class RegisterController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-   /*      PENDIENTE DE COMPROBAR
-   if ($request->role == 'member') {
-            $user = User::where('email', $request->email)->first();
-            if ($user) {
-                $user->update([
-                    'role' => 'user',
-                    'user_type' => 'student',
-                ]);
-            }
-        } */
-
 
 
         // Creación del nuevo usuario
         $user = User::create([
             'name' => $request->name,
             'lastname' => $request->lastname,
+            'dni' => $request->dni,
             'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
