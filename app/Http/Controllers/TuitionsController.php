@@ -16,6 +16,8 @@ class TuitionsController extends Controller
           //  'last_name' => 'required|string|max:255',
             'birth_date' => 'required|date',
             'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:255',
           //  'email' => 'required|email|unique:tuitions,email',
           //  'phone' => 'required|string|max:20',
             'subjects' => 'required|array', // Validamos que sea un array

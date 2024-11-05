@@ -20,11 +20,15 @@ class CreateUsersTable extends Migration
             $table->string('dni')->unique();
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('birth_date')->nullable();
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->enum('user_type', ['student', 'teacher', 'musician', 'member'])->default('member');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->foreignId('user_id')->nullable(); // relacion de padre-hijo
+            $table->foreignId('user_id')->nullable(); // relacion de socio-alumno
             $table->rememberToken();
             $table->timestamps();
         });
