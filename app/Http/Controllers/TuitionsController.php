@@ -4,55 +4,82 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Tuition;
+use App\Models\User;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 
 class TuitionsController extends Controller
 {
     public function store(Request $request)
     {
-        // Validamos los datos del formulario
+        // Asegurarse que el usuario autenticado es de tipo 'member'
+        $authenticatedUser = Auth::user();
+        if ($authenticatedUser->user_type !== 'member') {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        // Validar datos del formulario de matrícula
         $validatedData = $request->validate([
-          //  'first_name' => 'required|string|max:255',
-          //  'last_name' => 'required|string|max:255',
-            'birth_date' => 'required|date',
+            'name' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'dni' => 'nullable|string|max:9', // dni puede ser null o string
+            'phone' => 'required|regex:/^(\+?[0-9]{1,3})?[-. ]?\(?[0-9]{3}\)?[-. ]?[0-9]{3}[-. ]?[0-9]{3,4}$/',
             'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:255',
-          //  'email' => 'required|email|unique:tuitions,email',
-          //  'phone' => 'required|string|max:20',
-            'subjects' => 'required|array', // Validamos que sea un array
-            'subjects.*' => 'string', // Cada asignatura debe ser una cadena de texto
+            'city' => 'required|string|max:100',
+            'postal_code' => 'nullable|string|max:5',
+            'birth_date' => 'required|date',
+            'subjects' => 'required|array', // Asegurarse de que es un array
+            'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
         ]);
 
-           /*      PENDIENTE DE COMPROBAR
-   if ($request->role == 'member') {
-            $user = User::where('email', $request->email)->first();
-            if ($user) {
-                $user->update([
-                    'role' => 'user',
-                    'user_type' => 'student',
-                ]);
+        // Buscar si el DNI existe en la base de datos
+        $user = User::where('dni', $validatedData['dni'])->first();
+
+        if ($user) {
+            // Comprobar si los datos han cambiado
+            $changes = [];
+            foreach (['name', 'lastname', 'phone', 'address', 'city', 'postal_code', 'birth_date'] as $field) {
+                if ($user->$field !== $validatedData[$field]) {
+                    $changes[$field] = $validatedData[$field];
+                }
             }
-        } */
 
-        // Creamos un nuevo registro en la tabla `tuitions`
-        Tuition::create([
-            'first_name' => $validatedData['first_name'],
-            'last_name' => $validatedData['last_name'],
-            'birth_date' => $validatedData['birth_date'],
-            'address' => $validatedData['address'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
-            'subjects' => json_encode($validatedData['subjects']), // Convertimos el array a JSON
-        ]);
+            // Si hay cambios, actualizar datos y cambiar tipo de usuario a 'student'
+            if (!empty($changes)) {
+                $changes['user_type'] = 'student';
+                $user->update($changes);
+            }
 
-        return response()->json(['message' => 'Matrícula creada exitosamente.']);
+            // Agregar asignaturas al usuario
+            $user->subjects()->syncWithoutDetaching($validatedData['subjects']);
+        } else {
+            // Crear un nuevo usuario si el DNI no existe
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'lastname' => $validatedData['lastname'],
+                'dni' => $validatedData['dni'],
+                'phone' => $validatedData['phone'],
+                'address' => $validatedData['address'],
+                'city' => $validatedData['city'],
+                'postal_code' => $validatedData['postal_code'],
+                'birth_date' => $validatedData['birth_date'],
+                'email' => $request->email, // asumir que se recoge desde el request
+                'password' => bcrypt('defaultpassword'), // contraseña temporal
+                'user_type' => 'student',
+                'parent_id' => $authenticatedUser->id, // foreign key al miembro autenticado
+            ]);
+
+            // Agregar asignaturas al nuevo usuario
+            $user->subjects()->attach($validatedData['subjects']);
+        }
+
+        return response()->json(['message' => 'Matrícula creada exitosamente.', $user]);
     }
 
     public function show()
     {
         // Obtenemos los datos del usuario actualmente autenticado
         $user = Auth::user();
-        return response()->json( ['message' => 'Usuario actual.', $user]);
+        return response()->json(['message' => 'Usuario actual.', $user]);
     }
 }
