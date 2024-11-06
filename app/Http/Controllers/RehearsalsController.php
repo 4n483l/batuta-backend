@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Rehearsals;
+use App\Models\Rehearsal;
 
 
 // ensayos
@@ -10,7 +10,7 @@ class RehearsalsController extends Controller
 {
     public function index()
     {
-        $rehearsals = Rehearsals::all();
+        $rehearsals = Rehearsal::all();
         return response()->json(['message' => 'Lista de ensayos recuperada correctamente', 'Ensayos' => $rehearsals], 200);
     }
 }

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Classes;
+use App\Models\Course;
 
-class ClassesController extends Controller
+class CoursesController extends Controller
 {
     public function index()
     {
-        $classes = Classes::all();
+        $classes = Course::all();
         return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Clases' => $classes], 200);
     }
 }

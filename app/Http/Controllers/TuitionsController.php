@@ -28,6 +28,7 @@ class TuitionsController extends Controller
             'city' => 'required|string|max:100',
             'postal_code' => 'nullable|string|max:5',
             'birth_date' => 'required|date',
+            'email' => 'required|email',
             'subjects' => 'required|array', // Asegurarse de que es un array
             'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
         ]);

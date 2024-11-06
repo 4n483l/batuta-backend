@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Notes;
+use App\Models\Note;
 
 class NotesController extends Controller
 {
 
     public function index()
     {
-        $notes = Notes::all();
+        $notes = Note::all();
         return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notas' => $notes], 200);
     }
 }
