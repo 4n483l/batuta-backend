@@ -53,14 +53,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function children()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
 
     public function parent()
     {
-        return $this->hasMany(User::class, 'user_id');
+        return $this->hasMany(ChildStudent::class, 'child_student_id');
     }
 
     // belongsTo es para muchos a muchos

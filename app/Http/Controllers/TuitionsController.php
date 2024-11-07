@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tuition;
 use App\Models\User;
-use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ChildStudent;
 
 class TuitionsController extends Controller
 {
     public function store(Request $request)
     {
-        // Asegurarse que el usuario autenticado es de tipo 'member'
         $authenticatedUser = Auth::user();
-        if ($authenticatedUser->user_type !== 'member') {
+      //  $user_type = $authenticatedUser->user_type;
+
+        // Asegurarse que el usuario autenticado es de tipo 'member'
+         if ($authenticatedUser->user_type !== 'member') {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
@@ -34,7 +35,7 @@ class TuitionsController extends Controller
         ]);
 
         // Buscar si el DNI existe en la base de datos
-        $user = User::where('dni', $validatedData['dni'])->first();
+        $user = User::where('dni', $request->dni)->first();
 
         if ($user) {
             // Comprobar si los datos han cambiado
@@ -50,31 +51,30 @@ class TuitionsController extends Controller
                 $changes['user_type'] = 'student';
                 $user->update($changes);
             }
-
             // Agregar asignaturas al usuario
             $user->subjects()->syncWithoutDetaching($validatedData['subjects']);
         } else {
             // Crear un nuevo usuario si el DNI no existe
-            $user = User::create([
+            $child = ChildStudent::create([
                 'name' => $validatedData['name'],
                 'lastname' => $validatedData['lastname'],
-                'dni' => $validatedData['dni'],
+            /*     'dni' => $validatedData['dni'],
                 'phone' => $validatedData['phone'],
                 'address' => $validatedData['address'],
                 'city' => $validatedData['city'],
                 'postal_code' => $validatedData['postal_code'],
                 'birth_date' => $validatedData['birth_date'],
-                'email' => $request->email, // asumir que se recoge desde el request
-                'password' => bcrypt('defaultpassword'), // contraseña temporal
-                'user_type' => 'student',
-                'parent_id' => $authenticatedUser->id, // foreign key al miembro autenticado
+                'email' => $request->email, */ // asumir que se recoge desde el request
+               // 'password' => bcrypt('defaultpassword'), // contraseña temporal
+              //  'user_type' => 'student',
+                'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
             ]);
 
             // Agregar asignaturas al nuevo usuario
-            $user->subjects()->attach($validatedData['subjects']);
+            $child->subjects()->attach($validatedData['subjects']);
         }
 
-        return response()->json(['message' => 'Matrícula creada exitosamente.', $user]);
+        return response()->json(['message' => 'Matrícula creada exitosamente.', $child]);
     }
 
     public function show()

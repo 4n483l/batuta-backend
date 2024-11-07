@@ -15,6 +15,12 @@ class Subject extends Model
             ->withPivot('user_type')  // Para diferenciar si un usuario es alumno o profesor en esta asignatura
             ->withTimestamps();
     }
+
+    public function childStudents()
+    {
+        return $this->belongsToMany(ChildStudent::class, 'child_student_subject', 'child_student_id', 'subject_id')
+            ->withTimestamps();
+    }
     // Un profesor sube varios apuntes
     public function notes()
     {
