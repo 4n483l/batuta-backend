@@ -3,24 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Models\ChildStudent;
+use App\Models\User;
 
 class TuitionsController extends Controller
 {
     public function store(Request $request)
     {
         $authenticatedUser = Auth::user();
-      //  $user_type = $authenticatedUser->user_type;
 
         // Asegurarse que el usuario autenticado es de tipo 'member'
-         if ($authenticatedUser->user_type !== 'member') {
+        if ($authenticatedUser->user_type !== 'member') {
             return response()->json(['error' => 'No autorizado'], 403);
         }
-
         // Validar datos del formulario de matrícula
-        $validatedData = $request->validate([
+        $validator  =  Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'dni' => 'nullable|string|max:9', // dni puede ser null o string
@@ -33,9 +32,16 @@ class TuitionsController extends Controller
             'subjects' => 'required|array', // Asegurarse de que es un array
             'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+            ], 422); // Código de error para validación fallida
+        }
+        // Obtener los datos validados
+        $validatedData = $validator->validated();
 
         // Buscar si el DNI existe en la base de datos
-        $user = User::where('dni', $request->dni)->first();
+        $user = User::where('dni', $validatedData['dni'])->first(); //$request->dni
 
         if ($user) {
             // Comprobar si los datos han cambiado
@@ -58,15 +64,13 @@ class TuitionsController extends Controller
             $child = ChildStudent::create([
                 'name' => $validatedData['name'],
                 'lastname' => $validatedData['lastname'],
-            /*     'dni' => $validatedData['dni'],
+                'dni' => $validatedData['dni'],
                 'phone' => $validatedData['phone'],
                 'address' => $validatedData['address'],
                 'city' => $validatedData['city'],
                 'postal_code' => $validatedData['postal_code'],
                 'birth_date' => $validatedData['birth_date'],
-                'email' => $request->email, */ // asumir que se recoge desde el request
-               // 'password' => bcrypt('defaultpassword'), // contraseña temporal
-              //  'user_type' => 'student',
+                'email' => $validatedData['email'],
                 'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
             ]);
 
@@ -74,7 +78,7 @@ class TuitionsController extends Controller
             $child->subjects()->attach($validatedData['subjects']);
         }
 
-        return response()->json(['message' => 'Matrícula creada exitosamente.', $child]);
+        return response()->json(['message' => 'Matrícula creada exitosamente.',  'data' => $child], 201);
     }
 
     public function show()

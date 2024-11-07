@@ -9,6 +9,19 @@ class ChildStudent extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'lastname',
+        'dni',
+        'phone',
+        'address',
+        'city',
+        'postal_code',
+        'birth_date',
+        'email',
+        'user_id',
+    ];
+
     public function child()
     {
         return $this->belongsTo(User::class, 'user_id');

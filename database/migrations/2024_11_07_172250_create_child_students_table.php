@@ -18,7 +18,13 @@ class CreateChildStudentsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('lastname');
+            $table->string('dni')->nullable();
+            $table->string('phone');
+            $table->string('address');
+            $table->string('city');
+            $table->string('postal_code')->nullable();
             $table->string('birth_date');
+            $table->string('email');
             $table->timestamps();
         });
     }
