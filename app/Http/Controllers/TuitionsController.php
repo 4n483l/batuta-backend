@@ -32,16 +32,52 @@ class TuitionsController extends Controller
             'subjects' => 'required|array', // Asegurarse de que es un array
             'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
         ]);
+        // Si la validación falla, devolver los errores
         if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-            ], 422); // Código de error para validación fallida
+            return response()->json(['errors' => $validator->errors(), ], 422);
         }
         // Obtener los datos validados
         $validatedData = $validator->validated();
 
-        // Buscar si el DNI existe en la base de datos
-        $user = User::where('dni', $validatedData['dni'])->first(); //$request->dni
+        // Verificar si existe un alumno con los mismos datos dentro del contexto del padre (user_id)
+        /*   $existingStudent = ChildStudent::where([
+            ['name', $validatedData['name']],
+            ['lastname', $validatedData['lastname']],
+            ['birth_date', $validatedData['birth_date']],
+            ['user_id', $authenticatedUser->id],
+        ])->first();
+
+        if ($existingStudent) {
+            return response()->json(['error' => 'El alumno ya está matriculado.'], 409);
+        }*/
+
+        // Verificar coincidencias aproximadas
+        $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
+            ->where('user_id', $authenticatedUser->id)
+            ->where(function ($query) use ($validatedData) {
+                $query->where('name', 'LIKE', '%' . $validatedData['name'] . '%')
+                    ->orWhere('lastname', 'LIKE', '%' . $validatedData['lastname'] . '%');
+            })
+            ->first();
+
+        // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
+        if ($existingStudent) {
+            return response()->json([
+                'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',
+                'existing_student' => [
+                    'name' => $existingStudent->name,
+                    'lastname' => $existingStudent->lastname,
+                    'birth_date' => $existingStudent->birth_date,
+                    'dni' => $existingStudent->dni,
+                ]
+            ], 409); // Código 409 para conflicto
+    }
+
+        if ($validatedData['dni']) {
+            $user = User::where('dni', $validatedData['dni'])->first();
+        } else {
+            $user = null;
+    }
 
         if ($user) {
             // Comprobar si los datos han cambiado

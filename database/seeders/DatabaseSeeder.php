@@ -54,13 +54,15 @@ class DatabaseSeeder extends Seeder
 
 
         $rehearsals = Rehearsal::factory(5)->create();
-        User::all()->each(function ($user) use ($rehearsals) {
+
+        User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
             $user->rehearsals()->attach(
                 $rehearsals->random(3)->pluck('id')->toArray()
             );
         });
 
-        $concerts = Concert::factory(5)->create();
+        $concerts = Concert::factory(10)->create();
+
         User::all()->each(function ($user) use ($concerts) {
             $user->concerts()->attach(
                 $concerts->random(3)->pluck('id')->toArray()

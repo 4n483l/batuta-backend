@@ -24,24 +24,26 @@ use App\Http\Controllers\NotesController;
 |
 */
 
+// RUTAS PUBLICAS
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 
-// Route::post('/tuitions', [TuitionsController::class, 'store']);
+Route::get('/concerts', [ConcertsController::class, 'index']);
 
+// RUTAS PRIVADAS
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta
- Route::middleware('auth:sanctum')->post('/tuitions', [TuitionsController::class, 'store']);
+Route::middleware('auth:sanctum')->post('/tuitions', [TuitionsController::class, 'store']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
- Route::get('/tuitions', [TuitionsController::class, 'show']);
+// rutas que aun no sé si serán públicas o privadas
 
-Route::get('/concerts', [ConcertsController::class, 'index']);
+Route::get('/tuitions', [TuitionsController::class, 'show']);
 Route::get('/rehearsals', [RehearsalsController::class, 'index']);
 
-/* Route::get('/classes', [ClassesController::class, 'index']);
+/* Route::get('/courses', [CoursesController::class, 'index']);
 Route::get('/exams', [ExamsController::class, 'index']);
 Route::get('/notes', [NotesController::class, 'index']);
  */
