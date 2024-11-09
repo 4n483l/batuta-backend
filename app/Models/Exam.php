@@ -9,7 +9,7 @@ class Exam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'time', 'subject_id', 'user_id'];
+    protected $fillable = ['date', 'hour', 'classroom', 'subject_id', 'user_id'];
 
     // Un examen pertenece a una asignatura
     public function subject()

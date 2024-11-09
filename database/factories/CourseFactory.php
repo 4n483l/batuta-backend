@@ -17,13 +17,15 @@ class CourseFactory extends Factory
      */
     public function definition()
     {
-        return [
+        // fechas entre 2023 y 2025
+        $date = $this->faker->dateTimeBetween('2023-01-01', '2025-12-31');
 
+        return [
            'subject_id' => Subject::factory(),
             'user_id' => User::factory(),
             'classroom' => $this->faker->word,
-            'date' => $this->faker->date,
-            'hour' => $this->faker->time,
+            'date' => $date->format('Y-m-d'),
+            'hour' => $this->faker->time('H:i'),
         ];
     }
 }

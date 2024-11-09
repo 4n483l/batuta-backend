@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRehearsalUserTable extends Migration
+class CreateUserRehearsalTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateRehearsalUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('rehearsal_user', function (Blueprint $table) {
+        Schema::create('user_rehearsal', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rehearsal_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -28,6 +28,6 @@ class CreateRehearsalUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rehearsal_user');
+        Schema::dropIfExists('user_rehearsal');
     }
 }

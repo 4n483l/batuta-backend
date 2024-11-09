@@ -13,7 +13,7 @@ class Rehearsal extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'rehearsal_user', 'user_id', 'rehearsal_id')
+        return $this->belongsToMany(User::class, 'user_rehearsal', 'user_id', 'rehearsal_id')
             ->withPivot('user_type')
             ->withTimestamps();
     }

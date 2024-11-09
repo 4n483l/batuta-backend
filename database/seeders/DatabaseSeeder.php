@@ -23,20 +23,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-
-        // Crear 5 usuarios
+        // USERS
         $users = User::factory(5)->create();
 
-        // Crear 5 ChildStudents y asignarles el user_id de un usuario existente
-        $users->each(function ($user) {
-            ChildStudent::factory(5)->create([
-                'user_id' => $user->id, // Asignar el id del usuario a cada ChildStudent
-            ]);
-        });
+        // REHEARSALS
+        $rehearsals = Rehearsal::factory(20)->create();
 
+        // CONCERTS
+        Concert::factory(10)->create();
+
+        // NOTES
+        Note::factory(10)->create();
+
+        // SUBJECTS
         $subjects = Subject::factory(5)->create();
 
-        // Asignar asignaturas solo a los usuarios con tipo 'student'
+        // SUBJECT-USER
         $students = User::where('user_type', 'student')->get();
         $students->each(function ($user) use ($subjects) {
             $user->subjects()->attach(
@@ -44,37 +46,38 @@ class DatabaseSeeder extends Seeder
             );
         });
 
+        // EXAMS
+        Exam::factory(10)->create();
 
-        // Asignar asignaturas a ChildStudents
+        // COURSES
+        Course::factory(10)->create();
+
+        // CHILDSTUDENTS
+        $users->each(function ($user) {
+            ChildStudent::factory(5)->create([
+                'user_id' => $user->id, // Asignar el id del usuario a cada ChildStudent
+            ]);
+        });
+
+        // CHILDSTUDENT-SUBJECT
         ChildStudent::all()->each(function ($childStudent) use ($subjects) {
             $childStudent->subjects()->attach(
                 $subjects->random(3)->pluck('id')->toArray()
             );
         });
 
-
-        $rehearsals = Rehearsal::factory(5)->create();
-
+        // USER-REHEARSAL
         User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
             $user->rehearsals()->attach(
                 $rehearsals->random(3)->pluck('id')->toArray()
             );
         });
 
-        $concerts = Concert::factory(10)->create();
-
-        User::all()->each(function ($user) use ($concerts) {
-            $user->concerts()->attach(
-                $concerts->random(3)->pluck('id')->toArray()
-            );
-        });
 
 
 
 
-        Course::factory(10)->create();
-        Exam::factory(10)->create();
-        Note::factory(10)->create();
+
 
 
         //crea datos a nivel memoria sin guardar en sql

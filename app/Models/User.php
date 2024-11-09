@@ -12,7 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-
     /**
      * The attributes that are mass assignable.
      *
@@ -32,7 +31,6 @@ class User extends Authenticatable
         'user_type',
         'password',
 ];
-
 
     /**
      * The attributes that should be hidden for serialization.
@@ -88,15 +86,15 @@ class User extends Authenticatable
 
     public function rehearsals()
     {
-        return $this->belongsToMany(Rehearsal::class, 'rehearsal_user', 'user_id', 'rehearsal_id')
+        return $this->belongsToMany(Rehearsal::class, 'user_rehearsal', 'user_id', 'rehearsal_id')
             ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
             ->withTimestamps();
     }
 
-    public function concerts()
+  /*   public function concerts()
     {
         return $this->belongsToMany(Concert::class, 'concert_user', 'user_id', 'concert_id')
             ->withPivot('user_type')
             ->withTimestamps();
-    }
+    } */
 }

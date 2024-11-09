@@ -7,7 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ConcertsController;
 use App\Http\Controllers\RehearsalsController;
 use App\Http\Controllers\TuitionsController;
-use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExamsController;
 use App\Http\Controllers\NotesController;
 
@@ -29,6 +29,9 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 
 Route::get('/concerts', [ConcertsController::class, 'index']);
+Route::get('/exams', [ExamsController::class, 'index']);
+Route::get('/courses', [ CoursesController::class, 'index']);
+
 
 // RUTAS PRIVADAS
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta
@@ -43,8 +46,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/tuitions', [TuitionsController::class, 'show']);
 Route::get('/rehearsals', [RehearsalsController::class, 'index']);
 
-/* Route::get('/courses', [CoursesController::class, 'index']);
-Route::get('/exams', [ExamsController::class, 'index']);
+/*
 Route::get('/notes', [NotesController::class, 'index']);
  */
 

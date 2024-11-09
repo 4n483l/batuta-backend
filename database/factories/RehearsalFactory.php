@@ -15,10 +15,14 @@ class RehearsalFactory extends Factory
      */
     public function definition()
     {
+
+        // fechas entre 2023 y 2025
+        $date = $this->faker->dateTimeBetween('2023-01-01', '2025-12-31');
+
         return [
             'place' => $this->faker->randomElement(['auditorium', 'rehearsal room']),
-            'date' => $this->faker->date,
-            'hour' => $this->faker->time,
+            'date' => $date->format('Y-m-d'),
+            'hour' => $this->faker->time('H:i'),
         ];
     }
 }
