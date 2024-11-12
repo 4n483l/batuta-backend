@@ -32,52 +32,20 @@ class TuitionController extends Controller
             'subjects' => 'required|array', // Asegurarse de que es un array
             'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
         ]);
-        // Si la validación falla, devolver los errores
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), ], 422);
         }
-        // Obtener los datos validados
+
         $validatedData = $validator->validated();
 
-        // Verificar si existe un alumno con los mismos datos dentro del contexto del padre (user_id)
-        /*   $existingStudent = ChildStudent::where([
-            ['name', $validatedData['name']],
-            ['lastname', $validatedData['lastname']],
-            ['birth_date', $validatedData['birth_date']],
-            ['user_id', $authenticatedUser->id],
-        ])->first();
 
-        if ($existingStudent) {
-            return response()->json(['error' => 'El alumno ya está matriculado.'], 409);
-        }*/
-
-        // Verificar coincidencias aproximadas
-        $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
-            ->where('user_id', $authenticatedUser->id)
-            ->where(function ($query) use ($validatedData) {
-                $query->where('name', 'LIKE', '%' . $validatedData['name'] . '%')
-                    ->orWhere('lastname', 'LIKE', '%' . $validatedData['lastname'] . '%');
-            })
-            ->first();
-
-        // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
-        if ($existingStudent) {
-            return response()->json([
-                'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',
-                'existing_student' => [
-                    'name' => $existingStudent->name,
-                    'lastname' => $existingStudent->lastname,
-                    'birth_date' => $existingStudent->birth_date,
-                    'dni' => $existingStudent->dni,
-                ]
-            ], 409); // Código 409 para conflicto
-    }
 
         if ($validatedData['dni']) {
             $user = User::where('dni', $validatedData['dni'])->first();
         } else {
             $user = null;
-    }
+        }
 
         if ($user) {
             // Comprobar si los datos han cambiado
@@ -95,7 +63,32 @@ class TuitionController extends Controller
             }
             // Agregar asignaturas al usuario
             $user->subjects()->syncWithoutDetaching($validatedData['subjects']);
+
+            return response()->json(['message' => 'Matrícula creada exitosamente.', 'data' => $user], 201);
         } else {
+
+            // Verificar coincidencias aproximadas
+            $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
+                ->where('user_id', $authenticatedUser->id)
+                ->where(function ($query) use ($validatedData) {
+                    $query->where('name', 'LIKE', '%' . $validatedData['name'] . '%')
+                        ->orWhere('lastname', 'LIKE', '%' . $validatedData['lastname'] . '%');
+                })
+                ->first();
+
+            // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
+            if ($existingStudent) {
+                return response()->json([
+                    'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',
+                    'existing_student' => [
+                        'name' => $existingStudent->name,
+                        'lastname' => $existingStudent->lastname,
+                        'birth_date' => $existingStudent->birth_date,
+                        'dni' => $existingStudent->dni,
+                    ]
+                ], 409);
+            }
+
             // Crear un nuevo usuario si el DNI no existe
             $child = ChildStudent::create([
                 'name' => $validatedData['name'],
@@ -112,15 +105,23 @@ class TuitionController extends Controller
 
             // Agregar asignaturas al nuevo usuario
             $child->subjects()->attach($validatedData['subjects']);
-        }
 
-        return response()->json(['message' => 'Matrícula creada exitosamente.',  'data' => $child], 201);
+            return response()->json(['message' => 'Matrícula creada exitosamente.',  'data' => $child], 201);
+        }
     }
 
     public function show()
     {
-        // Obtenemos los datos del usuario actualmente autenticado
         $user = Auth::user();
-        return response()->json(['message' => 'Usuario actual.', $user]);
+        $userFields = [
+            'phone' => $user->phone,
+            'address' => $user->address,
+            'city' => $user->city,
+            'postal_code' => $user->postal_code,
+            'email' => $user->email
+        ];
+
+
+        return response()->json(['message' => 'Usuario actual.', 'usuario' => $userFields], 200);
     }
 }

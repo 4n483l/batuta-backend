@@ -41,7 +41,7 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role ?? 'user',
-            'user_type' => $request->user_type ?? 'student',
+            'user_type' => $request->user_type ?? 'member',
         ]);
 
         return response()->json(['message' => 'Usuario registrado satisfactoriamente!', 'user' => $user], 201);
