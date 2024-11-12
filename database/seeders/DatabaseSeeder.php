@@ -32,11 +32,15 @@ class DatabaseSeeder extends Seeder
         // CONCERTS
         Concert::factory(10)->create();
 
-        // NOTES
-        Note::factory(10)->create();
-
         // SUBJECTS
         $subjects = Subject::factory(5)->create();
+
+        // NOTES
+        Note::factory(10)->create();
+        Note::factory(10)->create([
+            'user_id' => $users->random()->id,
+            'subject_id' => $subjects->random()->id,
+        ]);
 
         // SUBJECT-USER
         $students = User::where('user_type', 'student')->get();

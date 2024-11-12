@@ -16,10 +16,10 @@ class CreateNotesTable extends Migration
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con el usuario
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('topic');
             $table->text('content');
-            $table->string('subject');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Note;
 use App\Models\User;
+use App\Models\Subject;
 
 class NoteFactory extends Factory
 {
@@ -19,10 +20,11 @@ class NoteFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'subject_id' => Subject::factory(),
             'title' => $this->faker->word,
             'topic' => $this->faker->word,
             'content' => $this->faker->text,
-            'subject' => $this->faker->word,
+
         ];
     }
 }

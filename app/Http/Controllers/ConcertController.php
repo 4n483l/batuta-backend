@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Concert;
 
-class ConcertsController extends Controller
+class ConcertController extends Controller
 {
     public function index()
     {

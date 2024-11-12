@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rehearsal;
 
 
-// ensayos
-class RehearsalsController extends Controller
+class RehearsalController extends Controller
 {
     public function index()
     {

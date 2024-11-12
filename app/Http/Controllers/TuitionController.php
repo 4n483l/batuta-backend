@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\ChildStudent;
 use App\Models\User;
 
-class TuitionsController extends Controller
+class TuitionController extends Controller
 {
     public function store(Request $request)
     {
