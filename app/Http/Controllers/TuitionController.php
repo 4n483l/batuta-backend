@@ -22,7 +22,7 @@ class TuitionController extends Controller
         $validator  =  Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'dni' => 'nullable|string|max:9', // dni puede ser null o string
+            'dni' => 'nullable|string|max:9',
             'phone' => 'required|regex:/^(\+?[0-9]{1,3})?[-. ]?\(?[0-9]{3}\)?[-. ]?[0-9]{3}[-. ]?[0-9]{3,4}$/',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
@@ -36,11 +36,9 @@ class TuitionController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), ], 422);
         }
-
         $validatedData = $validator->validated();
 
-
-
+        // se comprueba si el DNI ya existe en la base de datos o no para saber si crear usuario nuevo o actualizar uno existente
         if ($validatedData['dni']) {
             $user = User::where('dni', $validatedData['dni'])->first();
         } else {
@@ -48,7 +46,6 @@ class TuitionController extends Controller
         }
 
         if ($user) {
-            // Comprobar si los datos han cambiado
             $changes = [];
             foreach (['name', 'lastname', 'phone', 'address', 'city', 'postal_code', 'birth_date'] as $field) {
                 if ($user->$field !== $validatedData[$field]) {
@@ -61,7 +58,7 @@ class TuitionController extends Controller
                 $changes['user_type'] = 'student';
                 $user->update($changes);
             }
-            // Agregar asignaturas al usuario
+            // Agregar asignaturas
             $user->subjects()->syncWithoutDetaching($validatedData['subjects']);
 
             return response()->json(['message' => 'Matrícula creada exitosamente.', 'data' => $user], 201);
@@ -71,8 +68,18 @@ class TuitionController extends Controller
             $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
                 ->where('user_id', $authenticatedUser->id)
                 ->where(function ($query) use ($validatedData) {
-                    $query->where('name', 'LIKE', '%' . $validatedData['name'] . '%')
-                        ->orWhere('lastname', 'LIKE', '%' . $validatedData['lastname'] . '%');
+                    // Comprobación de coincidencia parcial en 'name' (cualquier palabra)
+                    $query->where(function ($subQuery) use ($validatedData) {
+                        foreach (explode(' ', $validatedData['name']) as $namePart) {
+                            $subQuery->orWhere('name', 'LIKE', '%' . $namePart . '%');
+                        }
+                    });
+                    // Comprobación de coincidencia parcial en 'lastname'
+                    $query->where(function ($subQuery) use ($validatedData) {
+                        foreach (explode(' ', $validatedData['lastname']) as $lastnamePart) {
+                            $subQuery->where('lastname', 'LIKE', '%' . $lastnamePart . '%');
+                        }
+                    });
                 })
                 ->first();
 
@@ -103,8 +110,8 @@ class TuitionController extends Controller
                 'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
             ]);
 
-            // Agregar asignaturas al nuevo usuario
-            $child->subjects()->attach($validatedData['subjects']);
+
+            $child->subjects()->syncWithoutDetaching($validatedData['subjects']);
 
             return response()->json(['message' => 'Matrícula creada exitosamente.',  'data' => $child], 201);
         }
