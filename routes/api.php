@@ -35,12 +35,14 @@ Route::get('/courses', [ CourseController::class, 'index']);
 
 
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta
-Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
+Route::middleware('auth:sanctum')->post('/notes', [NoteController::class, 'store']);
+
 
 
 Route::get('/notes', [NoteController::class, 'index']);

@@ -30,8 +30,12 @@ class NoteController extends Controller
         ]);
 
         // Generar el PDF directamente desde los datos del apunte
-        $pdf = PDF::loadHTML(view('pdf_template', compact('note'))->render());
-        
+         $pdf = \PDF::loadHTML(view('pdf_template', compact('note'))->render());
+
+
+        // Generar el PDF
+      //  $pdf = PDF::loadView('notes.pdf', ['note' => $note]);
+
         // Guardar el PDF en el almacenamiento local
         $fileName = 'note_' . $note->id . '.pdf';
         $path = storage_path('app/public/notes/' . $fileName);
