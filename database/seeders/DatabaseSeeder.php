@@ -11,6 +11,7 @@ use App\Models\Concert;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Note;
+use App\Models\Instrument;
 
 
 class DatabaseSeeder extends Seeder
@@ -31,6 +32,9 @@ class DatabaseSeeder extends Seeder
 
         // CONCERTS
         Concert::factory(10)->create();
+
+        // INSTRUMENTS
+        Instrument::factory(5)->create();
 
         // SUBJECTS
         $subjects = Subject::factory(5)->create();

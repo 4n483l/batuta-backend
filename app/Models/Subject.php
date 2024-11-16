@@ -21,6 +21,12 @@ class Subject extends Model
         return $this->belongsToMany(ChildStudent::class, 'child_student_subject', 'child_student_id', 'subject_id')
             ->withTimestamps();
     }
+
+    // Una asignatura tiene varios instrumentos
+    public function instruments()
+    {
+        return $this->hasMany(Instrument::class);
+    }
     // Un profesor sube varios apuntes
     public function notes()
     {

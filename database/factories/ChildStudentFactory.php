@@ -18,7 +18,7 @@ class ChildStudentFactory extends Factory
             'lastname' => $this->faker->lastName(),
             'dni' => $this->faker->unique()->numberBetween(10000000, 99999999),
             'phone' => $this->faker->phoneNumber(),
-            'address' => $this->faker->streetAddress(),
+            'address' => $this->faker->address(),
             'city' => $this->faker->city(),
             'postal_code' => $this->faker->postcode(),
             'birth_date' => $this->faker->date(),
