@@ -16,6 +16,7 @@ class Subject extends Model
             ->withTimestamps();
     }
 
+    // Una asignatura tiene varios alumnos
     public function childStudents()
     {
         return $this->belongsToMany(ChildStudent::class, 'child_student_subject', 'child_student_id', 'subject_id')
@@ -27,6 +28,8 @@ class Subject extends Model
     {
         return $this->hasMany(Instrument::class);
     }
+
+
     // Un profesor sube varios apuntes
     public function notes()
     {

@@ -66,6 +66,17 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+
+    // un usuario puede tener varios instrumentos
+    public function instruments()
+    {
+        return $this->belongsToMany(Instrument::class, 'instrument_user')
+            ->withPivot('subject_id')  // Si quieres almacenar el subject_id en la tabla pivote
+                ->withTimestamps();
+}
+
+
+
     // Un profesor sube varios apuntes y los alumnos pueden verlos
     public function notes()
     {

@@ -24,67 +24,92 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // USERS
+        // ----------------- USERS -----------------------
         $users = User::factory(5)->create();
 
-        // REHEARSALS
-        $rehearsals = Rehearsal::factory(20)->create();
+        // ----------------- REHEARSALS -----------------
+        $rehearsals =
+            Rehearsal::factory(20)->create();
 
-        // CONCERTS
+        // ----------------- CONCERTS-----------------
         Concert::factory(10)->create();
 
-        // INSTRUMENTS
+        // ----------------- INSTRUMENTS -----------------
         Instrument::factory(5)->create();
 
-        // SUBJECTS
+
+        // ----------------- SUBJECTS-----------------
         $subjects = Subject::factory(5)->create();
 
-        // NOTES
+        // ----------------- SUBJECT-CHILD -----------------
+
+        
+
+
+
+
+
+
+        $students = ChildStudent::where('user_type', 'student')->get();
+
+        $students->each(function ($user) use ($subjects) {
+            // Obtener la asignatura Instrumento asegurando que existe
+            $instrumentSubject  = Subject::firstOrCreate(
+                ['name' => 'Instrumento'],
+                ['level' => 'Básico']
+            );
+
+            // asigna Instrumento y otra aleatoria al estudiante
+            $otherSubject = $subjects->where('name', '!=', 'Instrumento')->random();
+            $user->subjects()->attach([$instrumentSubject->id, $otherSubject->id]);
+
+            // obtener un instrumento de la asignatura "Instrumento"
+            $instrument = Instrument::where('subject_id', $instrumentSubject->id)->get();
+
+            // Asocia ese instrumento al usuario en la asignatura "Instrumento"
+            if ($instrument->count() > 0) {
+
+                $randomInstrument = $instrument->random();
+                $user->instruments()->attach($randomInstrument->id, [
+                    'subject_id' => $instrumentSubject->id,
+                'user_id' => $user->id,
+                ]);
+            }
+        });
+
+        // ----------------- NOTES -----------------
         Note::factory(10)->create();
         Note::factory(10)->create([
             'user_id' => $users->random()->id,
             'subject_id' => $subjects->random()->id,
         ]);
 
-        // SUBJECT-USER
-        $students = User::where('user_type', 'student')->get();
-        $students->each(function ($user) use ($subjects) {
-            $user->subjects()->attach(
-                $subjects->random(3)->pluck('id')->toArray()
-            );
-        });
-
-        // EXAMS
+        // -----------------  EXAMS -----------------
         Exam::factory(10)->create();
 
-        // COURSES
+        // COURSES -----------------
         Course::factory(10)->create();
 
-        // CHILDSTUDENTS
+        //----------------- CHILDSTUDENTS -----------------
         $users->each(function ($user) {
             ChildStudent::factory(5)->create([
                 'user_id' => $user->id, // Asignar el id del usuario a cada ChildStudent
             ]);
         });
 
-        // CHILDSTUDENT-SUBJECT
+        // ----------------- CHILDSTUDENT-SUBJECT -----------------
         ChildStudent::all()->each(function ($childStudent) use ($subjects) {
             $childStudent->subjects()->attach(
                 $subjects->random(3)->pluck('id')->toArray()
             );
         });
 
-        // USER-REHEARSAL
+        // ----------------- USER-REHEARSAL -----------------
         User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
             $user->rehearsals()->attach(
                 $rehearsals->random(3)->pluck('id')->toArray()
             );
         });
-
-
-
-
-
 
 
 

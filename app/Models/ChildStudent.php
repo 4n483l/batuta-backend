@@ -29,8 +29,12 @@ class ChildStudent extends Model
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'child_student_subject', 'child_student_id', 'subject_id')
-            ->withTimestamps();
+        return $this->belongsToMany(Subject::class, 'child_student_subject', 'child_student_id', 'subject_id');
+    }
+
+    public function instruments()
+    {
+        return $this->belongsToMany(Instrument::class, 'child_student_id', 'instrument_id');
     }
 
 }

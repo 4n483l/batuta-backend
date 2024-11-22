@@ -29,23 +29,26 @@ class NoteController extends Controller
             'subject_id' => $validated['subject_id'],
         ]);
 
-        // Generar el PDF directamente desde los datos del apunte
-         $pdf = \PDF::loadHTML(view('pdf_template', compact('note'))->render());
+        // ** Devueve una respuesta al cliente (Angular) **
+        return response()->json([
+            'message' => 'Apunte creado exitosamente. Edite antes de guardar como PDF.',
+            'note' => $note
+        ], 201);
+    }
+    public function generatePdf(Request $request)
+    {
+        $note = Note::find($request->id);
+        if (!$note) {
+            return response()->json(['message' => 'Apunte no encontrado.'], 404);
+        }
 
+        $pdf = PDF::loadView('pdf_template', compact('note'));
 
-        // Generar el PDF
-      //  $pdf = PDF::loadView('notes.pdf', ['note' => $note]);
-
-        // Guardar el PDF en el almacenamiento local
         $fileName = 'note_' . $note->id . '.pdf';
         $path = storage_path('app/public/notes/' . $fileName);
         $pdf->save($path);
 
-        // Devolver una respuesta al cliente
-        return response()->json([
-            'message' => 'Apunte creado y PDF generado exitosamente.',
-            'pdf_url' => asset('storage/notes/' . $fileName)
-        ], 201);
+        return response()->json(['pdf_url' => asset('storage/notes/' . $fileName)]);
     }
 
     public function index()

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInstrumentsTable extends Migration
+class CreateInstrumentUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateInstrumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('instruments', function (Blueprint $table) {
+        Schema::create('instrument_user', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('instrument_id')->constrained();
+            $table->foreignId('user_id')->constrained();
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ class CreateInstrumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('instruments');
+        Schema::dropIfExists('instrument_user');
     }
 }

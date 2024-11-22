@@ -10,11 +10,14 @@ use App\Models\User;
 class ExamFactory extends Factory
 {
     protected $model = Exam::class;
+
     /**
      * Define the model's default state.
      *
      * @return array
      */
+
+     
     public function definition()
     {
         // fechas entre 2023 y 2025

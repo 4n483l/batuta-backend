@@ -14,7 +14,6 @@ class Rehearsal extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_rehearsal', 'user_id', 'rehearsal_id')
-            ->withPivot('user_type')
-            ->withTimestamps();
+            ->withPivot('user_type');
     }
 }

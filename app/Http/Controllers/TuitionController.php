@@ -31,6 +31,7 @@ class TuitionController extends Controller
             'email' => 'required|email',
             'subjects' => 'required|array', // Asegurarse de que es un array
             'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
+            'instrument' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -38,83 +39,75 @@ class TuitionController extends Controller
         }
         $validatedData = $validator->validated();
 
+        // TODO: revisar dni para no cambiar datos a la hora de la matricula
+
         // se comprueba si el DNI ya existe en la base de datos o no para saber si crear usuario nuevo o actualizar uno existente
-        if ($validatedData['dni']) {
-            $user = User::where('dni', $validatedData['dni'])->first();
-        } else {
-            $user = null;
+        if ($validatedData['dni'] && ChildStudent::where('dni', $validatedData['dni'])->exists()) {
+            return response()->json([
+                'error' => 'Ya existe un estudiante con ese DNI en la base de datos.',
+            ], 409);
+        }
+        // Verificar coincidencias aproximadas
+        $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
+            ->where('user_id', $authenticatedUser->id)
+            ->where(function ($query) use ($validatedData) {
+                // Comprobación de coincidencia parcial en 'name' (cualquier palabra)
+                $query->where(function ($subQuery) use ($validatedData) {
+                    foreach (explode(' ', $validatedData['name']) as $namePart) {
+                        $subQuery->orWhere('name', 'LIKE', '%' . $namePart . '%');
+                    }
+                });
+                // Comprobación de coincidencia parcial en 'lastname'
+                $query->where(function ($subQuery) use ($validatedData) {
+                    foreach (explode(' ', $validatedData['lastname']) as $lastnamePart) {
+                        $subQuery->where('lastname', 'LIKE', '%' . $lastnamePart . '%');
+                    }
+                });
+            })
+            ->first();
+
+        // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
+        if ($existingStudent) {
+            return response()->json([
+                'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',
+                'existing_student' => [
+                    'name' => $existingStudent->name,
+                    'lastname' => $existingStudent->lastname,
+                    'birth_date' => $existingStudent->birth_date,
+                    'dni' => $existingStudent->dni,
+                ]
+            ], 409);
         }
 
-        if ($user) {
-            $changes = [];
-            foreach (['name', 'lastname', 'phone', 'address', 'city', 'postal_code', 'birth_date'] as $field) {
-                if ($user->$field !== $validatedData[$field]) {
-                    $changes[$field] = $validatedData[$field];
-                }
-            }
+        // Crear un nuevo registro de estudiante
+        $child = ChildStudent::create([
+            'name' => $validatedData['name'],
+            'lastname' => $validatedData['lastname'],
+            'dni' => $validatedData['dni'],
+            'phone' => $validatedData['phone'],
+            'address' => $validatedData['address'],
+            'city' => $validatedData['city'],
+            'postal_code' => $validatedData['postal_code'],
+            'birth_date' => $validatedData['birth_date'],
+            'email' => $validatedData['email'],
+            'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
+        ]);
 
-            // Si hay cambios, actualizar datos y cambiar tipo de usuario a 'student'
-            if (!empty($changes)) {
-                $changes['user_type'] = 'student';
-                $user->update($changes);
-            }
-            // Agregar asignaturas
-            $user->subjects()->syncWithoutDetaching($validatedData['subjects']);
+        $child->subjects()->syncWithoutDetaching($validatedData['subjects']);
+        $child->instruments()->syncWithoutDetaching([
+            'name' => $validatedData['instrument']
+        ]);
 
-            return response()->json(['message' => 'Matrícula creada exitosamente.', 'data' => $user], 201);
-        } else {
-
-            // Verificar coincidencias aproximadas
-            $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
-                ->where('user_id', $authenticatedUser->id)
-                ->where(function ($query) use ($validatedData) {
-                    // Comprobación de coincidencia parcial en 'name' (cualquier palabra)
-                    $query->where(function ($subQuery) use ($validatedData) {
-                        foreach (explode(' ', $validatedData['name']) as $namePart) {
-                            $subQuery->orWhere('name', 'LIKE', '%' . $namePart . '%');
-                        }
-                    });
-                    // Comprobación de coincidencia parcial en 'lastname'
-                    $query->where(function ($subQuery) use ($validatedData) {
-                        foreach (explode(' ', $validatedData['lastname']) as $lastnamePart) {
-                            $subQuery->where('lastname', 'LIKE', '%' . $lastnamePart . '%');
-                        }
-                    });
-                })
-                ->first();
-
-            // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
-            if ($existingStudent) {
-                return response()->json([
-                    'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',
-                    'existing_student' => [
-                        'name' => $existingStudent->name,
-                        'lastname' => $existingStudent->lastname,
-                        'birth_date' => $existingStudent->birth_date,
-                        'dni' => $existingStudent->dni,
-                    ]
-                ], 409);
-            }
-
-            // Crear un nuevo usuario si el DNI no existe
-            $child = ChildStudent::create([
-                'name' => $validatedData['name'],
-                'lastname' => $validatedData['lastname'],
-                'dni' => $validatedData['dni'],
-                'phone' => $validatedData['phone'],
-                'address' => $validatedData['address'],
-                'city' => $validatedData['city'],
-                'postal_code' => $validatedData['postal_code'],
-                'birth_date' => $validatedData['birth_date'],
-                'email' => $validatedData['email'],
-                'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
-            ]);
-
-
-            $child->subjects()->syncWithoutDetaching($validatedData['subjects']);
-
-            return response()->json(['message' => 'Matrícula creada exitosamente.',  'data' => $child], 201);
-        }
+        // Recuperar las asignaturas asociadas al usuario junto con los instrumentos
+        $subjects = $child->subjects()->with('instruments')->get();
+        // Devolver la respuesta con las asignaturas e instrumentos
+        return response()->json([
+            'message' => 'Matrícula creada exitosamente.',
+            'data' => [
+                'child' => $child,
+                'subjects' => $subjects
+            ]
+        ], 201);
     }
 
     public function show()
@@ -127,8 +120,14 @@ class TuitionController extends Controller
             'postal_code' => $user->postal_code,
             'email' => $user->email
         ];
+        // Obtener las asignaturas asociadas al usuario
+        $subjects = $user->subjects()->with('instruments')->get();
 
 
-        return response()->json(['message' => 'Usuario actual.', 'usuario' => $userFields], 200);
+        return response()->json([
+            'message' => 'Usuario actual.',
+            'usuario' => $userFields,
+            'asignaturas' => $subjects
+        ], 200);
     }
 }

@@ -9,20 +9,28 @@ class Instrument extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'subject_id'];
+    protected $fillable = ['name', 'user_id', 'child_student_id'];
 
-    public function subject()
+    public function user()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsToMany(User::class, 'instrument_user');
     }
+
+
+    public function student()
+    {
+        return $this->belongsToMany(ChildStudent::class, 'instrument_child_student');
+    }
+
+
+
 
     protected static function booted()
     {
         static::creating(function ($instrument) {
             // Obtener dinámicamente el ID de la asignatura "Instrumentos"
-            $instrument->subject_id = Subject::where('name', 'Instrumentos')->value('id');
+            $instrument->subject_id = Subject::where('name', 'Instrumento')->value('id');
 
-            // Lanza una excepción si no existe la asignatura
             if (!$instrument->subject_id) {
                 throw new \Exception('La asignatura "Instrumentos" no está definida en la base de datos.');
         }
