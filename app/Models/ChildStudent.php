@@ -34,7 +34,7 @@ class ChildStudent extends Model
 
     public function instruments()
     {
-        return $this->belongsToMany(Instrument::class, 'child_student_id', 'instrument_id');
+        return $this->belongsToMany(Instrument::class, 'instrument_child_student','child_student_id', 'instrument_id');
     }
 
 }

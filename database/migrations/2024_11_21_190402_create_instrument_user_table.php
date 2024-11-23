@@ -15,9 +15,9 @@ class CreateInstrumentUserTable extends Migration
     {
         Schema::create('instrument_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instrument_id')->constrained();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->foreignId('instrument_id')->constrained() ->onDelete('cascade'); ;
+            $table->foreignId('user_id')->constrained() ->onDelete('cascade'); ;
+
             $table->timestamps();
         });
     }

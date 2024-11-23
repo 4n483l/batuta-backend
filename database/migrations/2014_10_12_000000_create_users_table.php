@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('postal_code')->nullable();
             $table->string('birth_date')->nullable();
             $table->enum('role', ['admin', 'user'])->default('user');
-            $table->enum('user_type', ['student', 'teacher', 'musician', 'member'])->default('member');
+            $table->enum('user_type', ['teacher', 'musician', 'member'])->default('member');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             // $table->foreignId('user_id')->nullable(); // relacion de socio-alumno

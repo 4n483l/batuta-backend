@@ -12,13 +12,13 @@ class Note extends Model
     protected $fillable = ['title', 'topic', 'content', 'user_id', 'subject_id'];
 
     // un apunte pertenece a un usuario
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }
 
     // un apunte pertenece a una asignatura
-    public function subject()
+    public function subjects()
     {
         return $this->belongsTo(Subject::class);
     }

@@ -15,10 +15,11 @@ class CreateInstrumentChildStudentTable extends Migration
     {
         Schema::create('instrument_child_student', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instrument_id')->constrained();
-            $table->foreignId('child_student_id')->constrained();
+            $table->foreignId('instrument_id')->constrained()->onDelete('cascade');
+            $table->foreignId('child_student_id')->constrained()->onDelete('cascade'); 
             $table->timestamps();
-        });
+});
+
     }
 
     /**

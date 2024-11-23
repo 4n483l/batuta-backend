@@ -12,13 +12,13 @@ class Course extends Model
     protected $fillable = ['subject_id', 'user_id', 'date', 'hour', 'classroom'];
 
     // una asignatura tiene varias clases
-    public function subject()
+    public function subjects()
     {
         return $this->belongsTo(Subject::class);
     }
 
     // un profesor imparte varias clases
-    public function professor()
+    public function teachers()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

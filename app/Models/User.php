@@ -30,7 +30,7 @@ class User extends Authenticatable
         'role',
         'user_type',
         'password',
-];
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -52,9 +52,9 @@ class User extends Authenticatable
     ];
 
 
-    public function parent()
+    public function children()
     {
-        return $this->hasMany(ChildStudent::class, 'child_student_id');
+        return $this->hasMany(ChildStudent::class, 'user_id');
     }
 
     // belongsTo es para muchos a muchos
@@ -62,18 +62,15 @@ class User extends Authenticatable
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_user', 'user_id', 'subject_id')
-            ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
-            ->withTimestamps();
+            ->withPivot('user_type');
     }
 
 
     // un usuario puede tener varios instrumentos
     public function instruments()
     {
-        return $this->belongsToMany(Instrument::class, 'instrument_user')
-            ->withPivot('subject_id')  // Si quieres almacenar el subject_id en la tabla pivote
-                ->withTimestamps();
-}
+        return $this->belongsToMany(Instrument::class, 'instrument_user', 'user_id', 'instrument_id');
+    }
 
 
 
@@ -98,11 +95,10 @@ class User extends Authenticatable
     public function rehearsals()
     {
         return $this->belongsToMany(Rehearsal::class, 'user_rehearsal', 'user_id', 'rehearsal_id')
-            ->withPivot('user_type')  // Almacenar si el usuario es profesor o alumno en la asignatura
-            ->withTimestamps();
+            ->withPivot('user_type');
     }
 
-  /*   public function concerts()
+    /*   public function concerts()
     {
         return $this->belongsToMany(Concert::class, 'concert_user', 'user_id', 'concert_id')
             ->withPivot('user_type')
