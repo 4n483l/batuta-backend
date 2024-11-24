@@ -20,12 +20,6 @@ class InstrumentFactory extends Factory
     {
         return [
             'name' => $this->faker->word,
-            'child_student_id' => $this->faker->unique()->numberBetween(1, 100),
-
-            'subject_id' => Subject::firstOrCreate(
-                ['name' => 'Instrumento'], // Asegura que "Instrumentos" exista
-                ['level' => 'Básico'] // Puedes ajustar el nivel si es necesario
-            )->id,
         ];
     }
 }

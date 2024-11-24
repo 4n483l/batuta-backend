@@ -10,8 +10,7 @@ class SubjectController extends Controller
 {
     public function index()
     {
-
-          $subjects = Subject::all();
+        $subjects = Subject::all();
         return response()->json(['subjects' => $subjects], 200);
     }
 

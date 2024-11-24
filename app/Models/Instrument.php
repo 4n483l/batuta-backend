@@ -16,17 +16,9 @@ class Instrument extends Model
         return $this->belongsToMany(User::class, 'instrument_user', 'instrument_id', 'user_id');
     }
 
-
-   /*  public function student()
-    {
-        return $this->belongsToMany(ChildStudent::class, 'instrument_child_student');
-    } */
-
     // Relación con estudiantes
-public function students()
-{
-    return $this->belongsToMany(ChildStudent::class, 'instrument_child_student', 'instrument_id', 'child_student_id');
-}
-
-
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'instrument_student', 'instrument_id', 'student_id');
+    }
 }

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 use App\Models\User;
-use App\Models\ChildStudent;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Rehearsal;
 use App\Models\Concert;
@@ -42,9 +42,8 @@ class DatabaseSeeder extends Seeder
         // ----------------- INSTRUMENTS -----------------
         $instruments = Instrument::factory(5)->create();
 
-
         // ----------------- SUBJECTS-----------------
-        $subjects = Subject::factory(5)->create();
+        $subjects = Subject::factory(3)->create();
 
         // -----------------  EXAMS -----------------
         Exam::factory(10)->create();
@@ -52,29 +51,23 @@ class DatabaseSeeder extends Seeder
         // COURSES -----------------
         Course::factory(10)->create();
 
-        //----------------- CHILDSTUDENTS -----------------
+        //----------------- STUDENTS -----------------
         $members->each(function ($member) use ($instruments, $subjects) {
-            // Decidir aleatoriamente si este miembro tendrá hijos (1 o 2 ChildStudents)
-            $numberOfChildren = rand(0, 2);
-            if ($numberOfChildren > 0) {
-                $childStudents = ChildStudent::factory($numberOfChildren)->create([
+            // Decidir aleatoriamente si este miembro tendrá estudiantes(1 o 2 Students)
+            $numberOfStudents = rand(0, 2);
+            if ($numberOfStudents > 0) {
+                $students = Student::factory($numberOfStudents)->create([
                     'user_id' => $member->id, // Asignar el id del miembro
                 ]);
 
-
-
-                // Asociar instrumentos y asignaturas a los ChildStudents
-                $childStudents->each(function ($childStudent) use ($instruments, $subjects) {
-                    // Asignar un instrumento aleatorio al ChildStudent
+                // Asociar instrumentos y asignaturas a los students
+                $students->each(function ($student) use ($instruments, $subjects) {
+                    // Asignar un instrumento aleatorio al student
                     $randomInstrument = $instruments->random();
+                    $student->instruments()->attach($randomInstrument->id);
 
-
-
-                    $childStudent->instruments()->attach($randomInstrument->id);
-
-                    // Asignar hasta 2 asignaturas aleatorias al ChildStudent
-                    $randomSubjects = $subjects->random(rand(1, 2)); // Puede asignarse 1 o 2 asignaturas
-                    $childStudent->subjects()->attach($randomSubjects->pluck('id')->toArray());
+                    $randomSubjects = $subjects->random(rand(1, 2));
+                    $student->subjects()->attach($randomSubjects->pluck('id')->toArray());
                 });
             }
         });
@@ -89,10 +82,7 @@ class DatabaseSeeder extends Seeder
 
         // ----------------- NOTES -----------------
         Note::factory(10)->create();
-        Note::factory(10)->create([
-            'user_id' => $users->random()->id,
-            'subject_id' => $subjects->random()->id,
-        ]);
+
 
 
 

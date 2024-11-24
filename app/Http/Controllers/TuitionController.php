@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\ChildStudent;
+use App\Models\Student;
 use App\Models\User;
 
 class TuitionController extends Controller
@@ -18,7 +18,6 @@ class TuitionController extends Controller
         if ($authenticatedUser->user_type !== 'member') {
             return response()->json(['error' => 'No autorizado'], 403);
         }
-        // Validar datos del formulario de matrícula
         $validator  =  Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -42,13 +41,13 @@ class TuitionController extends Controller
         // TODO: revisar dni para no cambiar datos a la hora de la matricula
 
         // se comprueba si el DNI ya existe en la base de datos o no para saber si crear usuario nuevo o actualizar uno existente
-        if ($validatedData['dni'] && ChildStudent::where('dni', $validatedData['dni'])->exists()) {
+        if ($validatedData['dni'] && Student::where('dni', $validatedData['dni'])->exists()) {
             return response()->json([
                 'error' => 'Ya existe un estudiante con ese DNI en la base de datos.',
             ], 409);
         }
         // Verificar coincidencias aproximadas
-        $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
+        $existingStudent = Student::where('birth_date', $validatedData['birth_date'])
             ->where('user_id', $authenticatedUser->id)
             ->where(function ($query) use ($validatedData) {
                 // Comprobación de coincidencia parcial en 'name' (cualquier palabra)
@@ -80,7 +79,7 @@ class TuitionController extends Controller
         }
 
         // Crear un nuevo registro de estudiante
-        $child = ChildStudent::create([
+        $student = Student::create([
             'name' => $validatedData['name'],
             'lastname' => $validatedData['lastname'],
             'dni' => $validatedData['dni'],
@@ -93,19 +92,15 @@ class TuitionController extends Controller
             'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
         ]);
 
-        $child->subjects()->syncWithoutDetaching($validatedData['subjects']);
-        $child->instruments()->syncWithoutDetaching([
+        $student->subjects()->syncWithoutDetaching($validatedData['subjects']);
+        $student->instruments()->syncWithoutDetaching([
             'name' => $validatedData['instrument']
         ]);
 
-        // Recuperar las asignaturas asociadas al usuario junto con los instrumentos
-        $subjects = $child->subjects()->with('instruments')->get();
-        // Devolver la respuesta con las asignaturas e instrumentos
         return response()->json([
             'message' => 'Matrícula creada exitosamente.',
             'data' => [
-                'child' => $child,
-                'subjects' => $subjects
+                'student' => $student,
             ]
         ], 201);
     }
@@ -113,6 +108,7 @@ class TuitionController extends Controller
     public function show()
     {
         $user = Auth::user();
+
         $userFields = [
             'phone' => $user->phone,
             'address' => $user->address,
@@ -120,14 +116,11 @@ class TuitionController extends Controller
             'postal_code' => $user->postal_code,
             'email' => $user->email
         ];
-        // Obtener las asignaturas asociadas al usuario
-        $subjects = $user->subjects()->with('instruments')->get();
-
 
         return response()->json([
             'message' => 'Usuario actual.',
             'usuario' => $userFields,
-            'asignaturas' => $subjects
+
         ], 200);
     }
 }

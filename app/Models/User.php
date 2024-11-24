@@ -52,13 +52,12 @@ class User extends Authenticatable
     ];
 
 
-    public function children()
+    public function students()
     {
-        return $this->hasMany(ChildStudent::class, 'user_id');
+        return $this->hasMany(Student::class, 'user_id');
     }
 
-    // belongsTo es para muchos a muchos
-    // Un profesor enseña muchas asignaturas, y un alumno se matricula en varias asignaturas
+
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_user', 'user_id', 'subject_id')
@@ -66,27 +65,23 @@ class User extends Authenticatable
     }
 
 
-    // un usuario puede tener varios instrumentos
     public function instruments()
     {
         return $this->belongsToMany(Instrument::class, 'instrument_user', 'user_id', 'instrument_id');
     }
 
-
-
-    // Un profesor sube varios apuntes y los alumnos pueden verlos
     public function notes()
     {
         return $this->hasMany(Note::class);
     }
 
-    // Un profesor crea exámenes para sus asignaturas, y los alumnos pueden ver estos exámenes
+
     public function exams()
     {
         return $this->hasMany(Exam::class);
     }
 
-    // Un profesor imparte varias clases
+
     public function courses()
     {
         return $this->hasMany(Course::class);
@@ -98,10 +93,5 @@ class User extends Authenticatable
             ->withPivot('user_type');
     }
 
-    /*   public function concerts()
-    {
-        return $this->belongsToMany(Concert::class, 'concert_user', 'user_id', 'concert_id')
-            ->withPivot('user_type')
-            ->withTimestamps();
-    } */
+
 }
