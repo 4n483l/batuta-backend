@@ -20,6 +20,7 @@ class CreateNotesTable extends Migration
             $table->string('title');
             $table->string('topic');
             $table->text('content');
+            $table->string('pdf')->nullable();
             $table->timestamps();
         });
     }
