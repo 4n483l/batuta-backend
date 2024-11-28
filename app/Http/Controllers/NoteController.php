@@ -10,6 +10,12 @@ use Barryvdh\DomPDF\Facade as PDF;
 class NoteController extends Controller
 {
 
+    public function index()
+    {
+        $notes = Note::all();
+        return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200);
+    }
+
     public function store(Request $request)
     {
         // Validar los datos de entrada
@@ -18,7 +24,14 @@ class NoteController extends Controller
             'topic' => 'required|string|max:255',
             'content' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
+            'pdf' => 'nullable|file'
         ]);
+
+        if ($request->hasFile('pdf')){
+            // Generar un nombre personalizado para el archivo (puedes usar el título, el ID del apunte, o cualquier otra cosa)
+            $fileName = $validated['title'] . '-' . time() . '.pdf';  // Por ejemplo, título + timestamp
+            $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');  // Guardar con el nombre personalizado
+        }
 
         // Crear el apunte en la base de datos
         $note = Note::create([
@@ -27,6 +40,7 @@ class NoteController extends Controller
             'topic' => $validated['topic'],
             'content' => $validated['content'],
             'subject_id' => $validated['subject_id'],
+            'pdf' => $path ?? null
         ]);
 
         // ** Devueve una respuesta al cliente (Angular) **
@@ -35,7 +49,8 @@ class NoteController extends Controller
             'note' => $note
         ], 201);
     }
-    public function generatePdf(Request $request)
+
+    /*  public function generatePdf(Request $request)
     {
         $note = Note::find($request->id);
         if (!$note) {
@@ -50,10 +65,6 @@ class NoteController extends Controller
 
         return response()->json(['pdf_url' => asset('storage/notes/' . $fileName)]);
     }
+ */
 
-    public function index()
-    {
-        $notes = Note::all();
-        return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200);
-    }
 }

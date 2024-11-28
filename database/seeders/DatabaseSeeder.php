@@ -72,6 +72,20 @@ class DatabaseSeeder extends Seeder
             }
         });
 
+        // ----------------- TEACHER-SUBJECT -----------------
+        $teachers->each(function ($teacher) use ($subjects, $instruments) {
+            // Seleccionar 2 asignaturas aleatorias para el teacher
+            $randomSubjects = $subjects->random(2);
+            // Asociar las asignaturas al teacher
+            $teacher->subjects()->attach($randomSubjects->pluck('id')->toArray());
+
+            // Seleccionar 1 instrumento aleatorio para el teacher
+            $randomInstrument = $instruments->random();
+        // Asociar el instrumento al teacher
+        $teacher->instruments()->attach($randomInstrument->id);
+    });
+
+
         // ----------------- USER-REHEARSAL -----------------
         User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
             $user->rehearsals()->attach(

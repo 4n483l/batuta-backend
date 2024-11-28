@@ -9,10 +9,10 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'topic', 'content', 'user_id', 'subject_id'];
+    protected $fillable = ['title', 'topic', 'content', 'user_id', 'subject_id', 'pdf'];
 
     // un apunte pertenece a un usuario
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\ChildStudent;
+use App\Models\Student;
 use App\Models\User;
 
 class PruebaTuitionController extends Controller
@@ -65,7 +65,7 @@ class PruebaTuitionController extends Controller
         } else {
 
             // Verificar coincidencias aproximadas
-            $existingStudent = ChildStudent::where('birth_date', $validatedData['birth_date'])
+            $existingStudent = Student::where('birth_date', $validatedData['birth_date'])
                 ->where('user_id', $authenticatedUser->id)
                 ->where(function ($query) use ($validatedData) {
                     // Comprobación de coincidencia parcial en 'name' (cualquier palabra)
@@ -97,7 +97,7 @@ class PruebaTuitionController extends Controller
             }
 
             // Crear un nuevo usuario si el DNI no existe
-            $child = ChildStudent::create([
+            $child = Student::create([
                 'name' => $validatedData['name'],
                 'lastname' => $validatedData['lastname'],
                 'dni' => $validatedData['dni'],
