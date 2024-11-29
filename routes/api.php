@@ -34,13 +34,18 @@ Route::apiResource('concerts', ConcertController::class);
 // Route::get('/concerts', [ConcertController::class, 'index']);
 // Route::post('/concerts', [ConcertController::class, 'store']);
 
-Route::get('/rehearsals', [RehearsalController::class, 'index']);
+Route::apiResource( 'rehearsals', RehearsalController::class);
+// Route::get('/rehearsals', [RehearsalController::class, 'index']);
+
+
 Route::get('/exams', [ExamController::class, 'index']);
 Route::get('/courses', [ CourseController::class, 'index']);
 
+Route::apiResource( 'subjects', SubjectController::class);
+// Route::get('/subjects', [SubjectController::class, 'index']);
 
-Route::get('/subjects', [SubjectController::class, 'index']);
-Route::get('/instruments', [InstrumentController::class, 'index']);
+Route::apiResource( 'instruments', InstrumentController::class);
+// Route::get('/instruments', [InstrumentController::class, 'index']);
 
 
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta

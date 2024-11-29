@@ -11,6 +11,8 @@ class Rehearsal extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['place', 'date', 'hour'];
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_rehearsal', 'user_id', 'rehearsal_id')

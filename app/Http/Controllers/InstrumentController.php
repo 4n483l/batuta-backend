@@ -13,6 +13,42 @@ class InstrumentController extends Controller
         return response()->json(['instruments' => $instruments], 200);
     }
 
+    public function store()
+    {
+        $data = request()->validate([
+            'name' => 'required',
+            'level' => 'required',
+        ]);
+
+        $instrument = Instrument::create($data);
+        return response()->json(['instrument' => $instrument], 201);
+    }
+
+    public function show($id)
+    {
+        $instrument = Instrument::findOrFail($id);
+        return response()->json(['instrument' => $instrument], 200);
+    }
+
+    public function update($id)
+    {
+        $data = request()->validate([
+            'name' => 'required',
+            'level' => 'required',
+        ]);
+
+        $instrument = Instrument::findOrFail($id);
+        $instrument->update($data);
+        return response()->json(['instrument' => $instrument], 200);
+    }
+
+    public function destroy($id)
+    {
+        $instrument = Instrument::findOrFail($id);
+        $instrument->delete();
+        return response()->json(['message' => 'Instrument deleted successfully'], 200);
+    }
+
     public function getTeacherInstruments()
     {
         $user = auth()->user();

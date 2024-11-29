@@ -36,7 +36,6 @@ class ConcertController extends Controller
     // get para update
     public function show($id)
     {
-        // Muestra un concierto específico
         return Concert::findOrFail($id);
     }
 

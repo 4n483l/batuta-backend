@@ -9,7 +9,7 @@ class Instrument extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'level'];
 
     public function users()
     {
