@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Instrument;
-use App\Models\Subject;
+
 
 class InstrumentFactory extends Factory
 {

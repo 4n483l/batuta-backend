@@ -9,17 +9,36 @@ class Exam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'hour', 'classroom', 'subject_id', 'user_id'];
+    protected $fillable = ['date', 'hour', 'classroom', 'subject_id', 'user_id', 'instrument_id'];
 
-    // Un examen pertenece a una asignatura
-    public function subjects()
+ 
+    public function subject()
     {
         return $this->belongsTo(Subject::class);
     }
 
-    // Un examen lo realiza un profesor
-    public function users()
+    public function instrument()
+    {
+        return $this->belongsTo(Instrument::class);
+    }
+
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Validar que solo uno de subject_id o instrument_id esté presente
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($exam) {
+            if (is_null($exam->subject_id) && is_null($exam->instrument_id)) {
+                throw new \Exception("Debe especificar un subject_id o un instrument_id.");
+            }
+            if (!is_null($exam->subject_id) && !is_null($exam->instrument_id)) {
+                throw new \Exception("Solo uno de subject_id o instrument_id debe estar presente.");
+            }
+        });
     }
 }

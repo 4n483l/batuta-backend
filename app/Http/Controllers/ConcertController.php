@@ -62,6 +62,6 @@ class ConcertController extends Controller
         $concert = Concert::findOrFail($id);
         $concert->delete();
 
-        return response()->json(['message' => 'Concierto eliminado correctamente']);
+        return response()->json(['message' => 'Concierto eliminado correctamente'], 200);
     }
 }

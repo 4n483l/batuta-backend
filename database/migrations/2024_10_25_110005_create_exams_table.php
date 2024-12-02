@@ -15,11 +15,12 @@ class CreateExamsTable extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Relación con la asignatura
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');    // Profesor que programa el examen
+            $table->foreignId('subject_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('instrument_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('date');
-            $table->string('hour');   
-            $table->string('classroom')->nullable(); // Aula donde se realizará el examen (opcional)
+            $table->string('hour');
+            $table->string('classroom')->nullable(); 
             $table->timestamps();
         });
     }

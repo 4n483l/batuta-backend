@@ -17,6 +17,7 @@ class CreateInstrumentStudentTable extends Migration
             $table->id();
             $table->foreignId('instrument_id')->constrained()->onDelete('cascade');
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            
             $table->timestamps();
 });
 

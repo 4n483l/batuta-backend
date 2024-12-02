@@ -15,11 +15,12 @@ class CreateCoursesTable extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Asignatura de la clase
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Profesor que imparte la clase
-            $table->date('date'); // Fecha de la clase
-            $table->string('hour'); // Hora de la clase
-            $table->string('classroom')->nullable(); // Aula (opcional)
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('instrument_id')->nullable()->constrained()->onDelete('cascade');
+            $table->date('date');
+            $table->string('hour');
+            $table->string('classroom')->nullable();
             $table->timestamps();
         });
     }

@@ -18,12 +18,21 @@ class LoginController extends Controller
 
         // Intentar autenticar al usuario
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Obtener el usuario autenticado
+
+
             $user = Auth::user();
-            // Generar un token para el usuario si estás usando Sanctum
             $token = $user->createToken('API Token')->plainTextToken;
 
-            return response()->json(['message' => 'Login correcto!', 'token' => $token], 200);
+            // Comprobar si el usuario tiene un estudiante asociado
+            $isStudent = $user->user_type === 'member' && $user->students()->exists();
+
+            return response()->json([
+                'message' => 'Login correcto!',
+                'token' => $token,
+                'user_type' => $user->user_type,
+                'is_student' => $isStudent, // Devuelves si tiene estudiantes asociados
+                'role' => $user->role,
+            ], 200);
         }
 
         return response()->json(['message' => 'Las credenciales no son válidas'], 401);

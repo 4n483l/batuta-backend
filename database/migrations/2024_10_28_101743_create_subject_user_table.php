@@ -15,11 +15,12 @@ class CreateSubjectUserTable extends Migration
     {
         Schema::create('subject_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->enum('user_type', ['teacher', 'musician'])->default('teacher');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('user_type'); 
             $table->timestamps();
-        });
+});
+
     }
 
     /**

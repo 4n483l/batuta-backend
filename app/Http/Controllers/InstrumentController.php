@@ -13,33 +13,37 @@ class InstrumentController extends Controller
         return response()->json(['instruments' => $instruments], 200);
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $data = request()->validate([
+        $validated  = $request->validate([
             'name' => 'required',
-            'level' => 'required',
+            'level' => 'nullable',
         ]);
+        $instrument = Instrument::create($validated);
 
-        $instrument = Instrument::create($data);
-        return response()->json(['instrument' => $instrument], 201);
+        return response()->json([
+            'message' => 'Instrumento creado correctamente.',
+            'instrument' => $instrument
+            ], 201);
     }
 
     public function show($id)
     {
-        $instrument = Instrument::findOrFail($id);
-        return response()->json(['instrument' => $instrument], 200);
+        return Instrument::findOrFail($id);
     }
 
-    public function update($id)
+    public function update(Request $request, $id)
     {
-        $data = request()->validate([
-            'name' => 'required',
-            'level' => 'required',
-        ]);
-
         $instrument = Instrument::findOrFail($id);
-        $instrument->update($data);
-        return response()->json(['instrument' => $instrument], 200);
+        $validated = $request->validate([
+            'name' => 'required',
+            'level' => 'nullable',
+        ]);
+        $instrument->update($validated);
+
+        // return response()->json(['instrument' => $instrument], 200);
+
+        return $instrument;
     }
 
     public function destroy($id)
@@ -52,11 +56,10 @@ class InstrumentController extends Controller
     public function getTeacherInstruments()
     {
         $user = auth()->user();
-        if($user->user_type == 'teacher' || $user->user_type == 'admin') {
+        if ($user->user_type == 'teacher' || $user->user_type == 'admin') {
             $instruments = $user->instruments;
             return response()->json(['instruments' => $instruments], 200);
         }
         return response()->json(['message' => 'No tienes permiso para acceder a esta ruta.'], 403);
     }
-
 }

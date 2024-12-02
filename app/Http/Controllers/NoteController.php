@@ -23,14 +23,19 @@ class NoteController extends Controller
             'title' => 'required|string|max:255',
             'topic' => 'required|string|max:255',
             'content' => 'required|string',
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => 'nullable|exists:subjects,id',
+            'instrument_id' => 'nullable|exists:instruments,id',
             'pdf' => 'nullable|file'
         ]);
 
+        if($request->input('subject_id') && $request->input('instrument_id')){
+            return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
+        }
+
         if ($request->hasFile('pdf')){
-            // Generar un nombre personalizado para el archivo (puedes usar el título, el ID del apunte, o cualquier otra cosa)
-            $fileName = $validated['title'] . '-' . time() . '.pdf';  // Por ejemplo, título + timestamp
-            $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');  // Guardar con el nombre personalizado
+            // Generar un nombre personalizado para el archivo PDF
+            $fileName = time() . $validated['title'] . '-' .  '.pdf';
+            $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
         }
 
         // Crear el apunte en la base de datos
@@ -39,7 +44,8 @@ class NoteController extends Controller
             'title' => $validated['title'],
             'topic' => $validated['topic'],
             'content' => $validated['content'],
-            'subject_id' => $validated['subject_id'],
+            'subject_id' => $validated['subject_id'] ?? null,
+            'instrument_id' => $validated['instrument_id'] ?? null,
             'pdf' => $path ?? null
         ]);
 

@@ -34,24 +34,32 @@ Route::apiResource('concerts', ConcertController::class);
 // Route::get('/concerts', [ConcertController::class, 'index']);
 // Route::post('/concerts', [ConcertController::class, 'store']);
 
-Route::apiResource( 'rehearsals', RehearsalController::class);
+Route::apiResource('rehearsals', RehearsalController::class) ;
 // Route::get('/rehearsals', [RehearsalController::class, 'index']);
 
 
 Route::get('/exams', [ExamController::class, 'index']);
 Route::get('/courses', [ CourseController::class, 'index']);
 
-Route::apiResource( 'subjects', SubjectController::class);
+Route::apiResource('subjects', SubjectController::class);
 // Route::get('/subjects', [SubjectController::class, 'index']);
 
-Route::apiResource( 'instruments', InstrumentController::class);
-// Route::get('/instruments', [InstrumentController::class, 'index']);
+ Route::apiResource('instruments', InstrumentController::class);
+/*  Route::get('/instruments', [InstrumentController::class, 'index']);
+Route::get('instruments/{id}', [InstrumentController::class, 'show']);
+ Route::post('/instruments', [InstrumentController::class, 'store']);
+Route::put('instruments/{id}', [InstrumentController::class, 'update']);
+Route::delete('instruments/{id}', [InstrumentController::class, 'destroy']); */
+
+Route::apiResource('courses', CourseController::class);
 
 
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
 
 Route::middleware('auth:sanctum')->get('/teacher/subjects', [SubjectController::class, 'getTeacherSubjects']);
 Route::middleware('auth:sanctum')->get('/teacher/instruments', [SubjectController::class, 'getTeacherInstruments']);
