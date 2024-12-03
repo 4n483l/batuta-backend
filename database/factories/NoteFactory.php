@@ -20,13 +20,13 @@ class NoteFactory extends Factory
     public function definition()
     {
 
-        $useSubjectInstrument = $this->faker->boolean(10);
+        $useSubjectInstrument = $this->faker->boolean(50);
 
         return [
 
             'subject_id' => $useSubjectInstrument ? Subject::factory() : null,
             'instrument_id' => !$useSubjectInstrument ? Instrument::factory() : null,
-            'user_id' => User::factory(),
+            'user_id' => User::where('user_type', 'teacher')->inRandomOrder()->first()->id,
             'title' => $this->faker->word,
             'topic' => $this->faker->word,
             'content' => $this->faker->text,

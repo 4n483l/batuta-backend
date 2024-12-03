@@ -5,15 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Note;
 use App\Models\Subject;
-use Barryvdh\DomPDF\Facade as PDF;
+use App\Models\Instrument;
 
 class NoteController extends Controller
 {
 
     public function index()
     {
-        $notes = Note::all();
-        return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200);
+        if(auth()->user()->user_type == 'teacher'){
+            $subjects = Subject::where('user_id', auth()->id())->pluck('id');
+            $instruments = Instrument::where('user_id', auth()->id())->pluck('id');
+
+            $notes = Note::WhereIn('subject_id', $subjects)
+                ->orWhereIn('instrument_id', $instruments)
+                ->get();
+
+            return response()->json(['message' => 'Lista de aputnes recuperada correctamente', 'Notes' => $notes], 200);
+        } else if(auth()->user()->user_type == 'member'){
+            
+
+
+            $notes = Note::where('user_id', auth()->id())->get();
+            return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200);
+        }
+
+       /*  $notes = Note::all();
+        return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200); */
     }
 
     public function store(Request $request)

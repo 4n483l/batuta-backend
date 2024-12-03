@@ -8,7 +8,8 @@ class ExamController extends Controller
 {
     public function index()
     {
-        $exams = Exam::with(['subject', 'instrument', 'user'])->get();
+        //$exams = Exam::with(['subject', 'instrument', 'user'])->get();
+        $exams = Exam::all();
         return response()->json(['message' => 'Lista de exámenes recuperada correctamente', 'Exams' => $exams], 200);
     }
 
@@ -36,8 +37,6 @@ class ExamController extends Controller
                 'message' => 'Debe proporcionar subject_id o instrument_id, pero no ambos a la vez.'
             ], 422);
         }
-
-        // Crear el examen
         $exam = Exam::create($validated);
 
         return response()->json([

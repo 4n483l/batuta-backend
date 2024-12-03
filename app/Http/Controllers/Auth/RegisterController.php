@@ -40,6 +40,7 @@ class RegisterController extends Controller
             'birth_date' => $request->birth_date,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            //'password' => $request->password,
             'role' => $request->role ?? 'user',
             'user_type' => $request->user_type ?? 'member',
         ]);

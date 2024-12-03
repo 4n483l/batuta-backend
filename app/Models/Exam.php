@@ -11,7 +11,7 @@ class Exam extends Model
 
     protected $fillable = ['date', 'hour', 'classroom', 'subject_id', 'user_id', 'instrument_id'];
 
- 
+
     public function subject()
     {
         return $this->belongsTo(Subject::class);
@@ -28,7 +28,7 @@ class Exam extends Model
     }
 
     // Validar que solo uno de subject_id o instrument_id esté presente
-    protected static function boot()
+      protected static function boot()
     {
         parent::boot();
 

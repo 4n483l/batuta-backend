@@ -12,6 +12,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\InstrumentController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -55,9 +56,8 @@ Route::apiResource('courses', CourseController::class);
 
 
 // garantiza que solo los usuarios autenticados puedan acceder a la ruta
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'students']);
 
 
 
@@ -68,9 +68,11 @@ Route::middleware('auth:sanctum')->get('/teacher/instruments', [SubjectControlle
 
 Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
+
+
+Route::middleware('auth:sanctum')->get('/notes', [NoteController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/notes', [NoteController::class, 'store']);
 
 
-Route::get('/notes', [NoteController::class, 'index']);
 
 

@@ -24,12 +24,12 @@ class ExamFactory extends Factory
         // fechas entre 2023 y 2025
         $date = $this->faker->dateTimeBetween('2023-01-01', '2025-12-31');
 
-        $useSubjectInstrument = $this->faker->boolean(10);
+        $useSubjectInstrument = $this->faker->boolean(50);
 
         return [
             'subject_id' => $useSubjectInstrument ? Subject::factory() : null,
             'instrument_id' => !$useSubjectInstrument ? Instrument::factory() : null,
-            'user_id' => User::factory(),
+            'user_id' => User::where('user_type', 'teacher')->inRandomOrder()->first()->id,
             'classroom' => $this->faker->word,
             'date' => $date->format('Y-m-d'),
             'hour' => $this->faker->time('H:i'),

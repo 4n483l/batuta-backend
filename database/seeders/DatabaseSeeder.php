@@ -29,9 +29,9 @@ class DatabaseSeeder extends Seeder
 
         // ----------------- USERS -----------------------
 
-        $musicians = User::factory(3)->create(['user_type' => 'musician']);
-        $teachers = User::factory(3)->create(['user_type' => 'teacher']);
-        $members = User::factory(3)->create(['user_type' => 'member']);
+        $musicians = User::factory(5)->create(['user_type' => 'musician']);
+        $teachers = User::factory(5)->create(['user_type' => 'teacher']);
+        $members = User::factory(5)->create(['user_type' => 'member']);
 
         $users = $musicians->concat($teachers)->concat($members);
 
@@ -47,6 +47,16 @@ class DatabaseSeeder extends Seeder
         // ----------------- INSTRUMENTS -----------------
         $instruments = Instrument::factory(3)->create();
 
+        // -----------------  EXAMS -----------------
+        Exam::factory(10)->create();
+
+        // ---------------- COURSES -----------------
+        Course::factory(10)->create();
+
+        // ----------------- NOTES -----------------
+         Note::factory(10)->create();
+
+
         // ----------- INSTRUMENT-MUSICIAN -----------------
         $musicians->each(function ($musician) use ($instruments) {
             $randomInstrument = $instruments->random();
@@ -57,54 +67,6 @@ class DatabaseSeeder extends Seeder
             $randomInstrument = $instruments->random();
             $teacher->instruments()->attach($randomInstrument->id, ['user_type' => 'teacher']);
         });
-
-
-        // -----------------  EXAMS -----------------
-        // Exam::factory(10)->create();
-        Exam::factory(10)->create()->each(function ($exam) use ($subjects, $instruments, $teachers) {
-            // Selecciona al azar un teacher para asignar el examen
-            $teacher = $teachers->random();
-
-            // Asigna solo uno de los dos campos (subject_id o instrument_id)
-            if (rand(0, 1)) {
-                $exam->subject_id = $subjects->random()->id;
-            } else {
-                $exam->instrument_id = $instruments->random()->id;
-            }
-
-            $exam->teacher_id = $teacher->id;
-
-            $exam->save();
-        });
-
-        // ---------------- COURSES -----------------
-        //  Course::factory(10)->create();
-
-        $teachers->each(function ($teacher) use ($subjects, $instruments) {
-            Course::factory(3)->create([
-                'user_id' => $teacher->id,
-                'subject_id' => $subjects->random()->id,
-            ]);
-            Course::factory(3)->create([
-                'user_id' => $teacher->id,
-                'instrument_id' => $instruments->random()->id,
-            ]);
-        });
-
-        // ----------------- NOTES -----------------
-        // Note::factory(10)->create();
-
-        $teachers->each(function ($teacher) use ($subjects, $instruments) {
-            Note::factory(3)->create([
-                'user_id' => $teacher->id,
-                'subject_id' => $subjects->random()->id,
-            ]);
-            Note::factory(3)->create([
-                'user_id' => $teacher->id,
-                'instrument_id' => $instruments->random()->id,
-            ]);
-        });
-
 
 
         //----------------- STUDENTS -----------------
