@@ -9,12 +9,11 @@ use App\Models\Instrument;
 
 class NoteController extends Controller
 {
-
     public function index()
     {
         $user = auth()->user();
-        if ($user->user_type === 'teacher') {
 
+        if ($user->user_type === 'teacher') {
 
             // Obtener asignaturas e instrumentos asociados al profesor
             $subjectIds = $user->subjects()->pluck('subjects.id');
@@ -23,13 +22,45 @@ class NoteController extends Controller
             // Traer apuntes asociados a las asignaturas e instrumentos
             $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
                 $query->whereIn('subject_id', $subjectIds)
-                  ->orWhereIn('instrument_id', $instrumentIds);
-        })->get();
+                    ->orWhereIn('instrument_id', $instrumentIds);
+            })->get();
 
             return response()->json([
                 'message' => 'Lista de apuntes recuperada correctamente.',
                 'Notes' => $notes
             ], 200);
+        } elseif ($user->user_type === 'member') {
+
+            $students = $user->students;
+            $apuntesAsignaturas = [];
+            $apuntesInstrumentos = [];
+
+            foreach ($students as $student) {
+
+                $subjectIds = $student->subjects->pluck('id')->toArray();
+                $instrumentIds = $student->instruments->pluck('id')->toArray();
+
+                if (!empty($subjectIds)) {
+                    $asignaturas[$student->id] = $subjectIds;
+                    $apuntes = Note::whereIn('subject_id', $subjectIds)->get();
+                    $apuntesAsignaturas[$student->id] = $apuntes;
+                }
+
+                if (!empty($instrumentIds)) {
+                    $instrumentos[$student->id] = $instrumentIds;
+                    $apuntes = Note::whereIn('instrument_id', $instrumentIds)->get();
+                    $apuntesInstrumentos[$student->id] = $apuntes;
+                }
+            }
+
+            return response()->json([
+                'message' => 'Lista de asignaturas y apuntes recuperada correctamente.',
+
+                'ApuntesAsignaturas' => $apuntesAsignaturas,
+                'ApuntesInstrumentos' => $apuntesInstrumentos
+            ], 200);
+
+
         } else {
             return response()->json([
                 'message' => 'El usuario no tiene permiso para ver apuntes.'
@@ -77,23 +108,22 @@ class NoteController extends Controller
         ], 201);
     }
 
-    /*  public function generatePdf(Request $request)
+
+    public function getNotesForAdmin()
     {
-        $note = Note::find($request->id);
-        if (!$note) {
-            return response()->json(['message' => 'Apunte no encontrado.'], 404);
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            $notes = Note::all();
+
+            return response()->json([
+                'message' => 'Lista de apuntes recuperada correctamente.',
+                'notes' => $notes
+            ], 200);
         }
 
-        $pdf = PDF::loadView('pdf_template', compact('note'));
-
-        $fileName = 'note_' . $note->id . '.pdf';
-        $path = storage_path('app/public/notes/' . $fileName);
-        $pdf->save($path);
-
-        return response()->json(['pdf_url' => asset('storage/notes/' . $fileName)]);
+        return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
     }
- */
-
 
     public function getSubjectsAndInstruments()
     {
@@ -112,6 +142,4 @@ class NoteController extends Controller
 
         return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
     }
-
-
 }

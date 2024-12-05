@@ -9,8 +9,15 @@ class CourseController extends Controller
 {
     public function index()
     {
-        //$courses = Course::with(['subject', 'instrument', 'user'])->get();
-        $courses = Course::all();
+        $user = auth()->user();
+        if ($user->user_type === 'teacher') {
+            
+            $courses = Course::where('user_id', $user->id)->with(['subject', 'instrument', 'user'])->get();
+            return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
+        }
+
+        $courses = Course::with(['subject', 'instrument', 'user'])->get();
+       // $courses = Course::all();
         return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
     }
 
