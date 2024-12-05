@@ -12,25 +12,29 @@ class NoteController extends Controller
 
     public function index()
     {
-        if(auth()->user()->user_type == 'teacher'){
-            $subjects = Subject::where('user_id', auth()->id())->pluck('id');
-            $instruments = Instrument::where('user_id', auth()->id())->pluck('id');
-
-            $notes = Note::WhereIn('subject_id', $subjects)
-                ->orWhereIn('instrument_id', $instruments)
-                ->get();
-
-            return response()->json(['message' => 'Lista de aputnes recuperada correctamente', 'Notes' => $notes], 200);
-        } else if(auth()->user()->user_type == 'member'){
-            
+        $user = auth()->user();
+        if ($user->user_type === 'teacher') {
 
 
-            $notes = Note::where('user_id', auth()->id())->get();
-            return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200);
+            // Obtener asignaturas e instrumentos asociados al profesor
+            $subjectIds = $user->subjects()->pluck('subjects.id');
+            $instrumentIds = $user->instruments()->pluck('instruments.id');
+
+            // Traer apuntes asociados a las asignaturas e instrumentos
+            $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
+                $query->whereIn('subject_id', $subjectIds)
+                  ->orWhereIn('instrument_id', $instrumentIds);
+        })->get();
+
+            return response()->json([
+                'message' => 'Lista de apuntes recuperada correctamente.',
+                'Notes' => $notes
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'El usuario no tiene permiso para ver apuntes.'
+            ], 403);
         }
-
-       /*  $notes = Note::all();
-        return response()->json(['message' => 'Lista de notas recuperada correctamente', 'Notes' => $notes], 200); */
     }
 
     public function store(Request $request)
@@ -45,11 +49,11 @@ class NoteController extends Controller
             'pdf' => 'nullable|file'
         ]);
 
-        if($request->input('subject_id') && $request->input('instrument_id')){
+        if ($request->input('subject_id') && $request->input('instrument_id')) {
             return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
         }
 
-        if ($request->hasFile('pdf')){
+        if ($request->hasFile('pdf')) {
             // Generar un nombre personalizado para el archivo PDF
             $fileName = time() . $validated['title'] . '-' .  '.pdf';
             $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
@@ -89,5 +93,25 @@ class NoteController extends Controller
         return response()->json(['pdf_url' => asset('storage/notes/' . $fileName)]);
     }
  */
+
+
+    public function getSubjectsAndInstruments()
+    {
+        $user = auth()->user();
+
+        if ($user->user_type === 'teacher') {
+            $subjects = $user->subjects()->get();
+            $instruments = $user->instruments()->get();
+
+            return response()->json([
+                'message' => 'Asignaturas e instrumentos recuperados correctamente.',
+                'subjects' => $subjects,
+                'instruments' => $instruments,
+            ], 200);
+        }
+
+        return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
+    }
+
 
 }

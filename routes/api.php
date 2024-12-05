@@ -32,8 +32,8 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 
 Route::apiResource('concerts', ConcertController::class);
-// Route::get('/concerts', [ConcertController::class, 'index']);
-// Route::post('/concerts', [ConcertController::class, 'store']);
+
+
 
 Route::apiResource('rehearsals', RehearsalController::class) ;
 // Route::get('/rehearsals', [RehearsalController::class, 'index']);
@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->get('/user/students', [UserController::class,
 
 
 Route::middleware('auth:sanctum')->get('/teacher/subjects', [SubjectController::class, 'getTeacherSubjects']);
-Route::middleware('auth:sanctum')->get('/teacher/instruments', [SubjectController::class, 'getTeacherInstruments']);
+Route::middleware('auth:sanctum')->get('/teacher/instruments', [InstrumentController::class, 'getTeacherInstruments']);
 
 
 
@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, '
 
 Route::middleware('auth:sanctum')->get('/notes', [NoteController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/notes', [NoteController::class, 'store']);
+Route::middleware('auth:sanctum')->get( '/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
 
 
 

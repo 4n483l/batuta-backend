@@ -62,4 +62,9 @@ class InstrumentController extends Controller
         }
         return response()->json(['message' => 'No tienes permiso para acceder a esta ruta.'], 403);
     }
+
+
+
+
+
 }
