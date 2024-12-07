@@ -28,8 +28,8 @@ class TuitionController extends Controller
             'postal_code' => 'nullable|string|max:5',
             'birth_date' => 'required|date',
             'email' => 'required|email',
-            'subjects' => 'required|array', // Asegurarse de que es un array
-            'subjects.*' => 'exists:subjects,id', // Cada subject_id debe existir en la tabla de subjects
+            'subjects' => 'required|array', 
+            'subjects.*' => 'exists:subjects,id',
             'instrument' => 'required|string|max:255',
         ]);
 
@@ -38,9 +38,6 @@ class TuitionController extends Controller
         }
         $validatedData = $validator->validated();
 
-        // TODO: revisar dni para no cambiar datos a la hora de la matricula
-
-        // se comprueba si el DNI ya existe en la base de datos o no para saber si crear usuario nuevo o actualizar uno existente
         if ($validatedData['dni'] && Student::where('dni', $validatedData['dni'])->exists()) {
             return response()->json([
                 'error' => 'Ya existe un estudiante con ese DNI en la base de datos.',
@@ -65,7 +62,6 @@ class TuitionController extends Controller
             })
             ->first();
 
-        // Si se encuentra un estudiante coincidente, enviar mensaje al usuario
         if ($existingStudent) {
             return response()->json([
                 'error' => 'Ya existe un alumno con datos similares. Póngase en contacto con la entidad para más información.',

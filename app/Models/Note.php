@@ -17,7 +17,6 @@ class Note extends Model
         return $this->belongsTo(User::class);
     }
 
-    // un apunte pertenece a una asignatura
     public function subject()
     {
         return $this->belongsTo(Subject::class);

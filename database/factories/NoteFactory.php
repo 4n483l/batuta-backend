@@ -21,7 +21,7 @@ class NoteFactory extends Factory
     {
 
         $useSubjectInstrument = $this->faker->boolean(50);
-
+/*
         return [
 
             'subject_id' => $useSubjectInstrument ? Subject::factory() : null,
@@ -31,6 +31,16 @@ class NoteFactory extends Factory
             'topic' => $this->faker->word,
             'content' => $this->faker->text,
 
+        ]; */
+
+        return [
+
+            'subject_id' => $useSubjectInstrument ? Subject::inRandomOrder()->first()->id : null,
+            'instrument_id' => !$useSubjectInstrument ?Instrument ::inRandomOrder()->first()->id  : null,
+            'user_id' => User::where('user_type', 'teacher')->inRandomOrder()->first()->id,
+            'title' => $this->faker->word,
+            'topic' => $this->faker->word,
+            'content' => $this->faker->text,
         ];
     }
 }

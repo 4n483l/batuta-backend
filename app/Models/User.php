@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function students()
     {
-        return $this->hasMany(Student::class, 'user_id');
+        return $this->hasMany(Student::class);
     }
 
 
@@ -67,7 +67,8 @@ class User extends Authenticatable
 
     public function instruments()
     {
-        return $this->belongsToMany(Instrument::class, 'instrument_user', 'user_id', 'instrument_id');
+        return $this->belongsToMany(Instrument::class, 'instrument_user', 'user_id', 'instrument_id')
+            ->withPivot('user_type');
     }
 
     public function notes()
@@ -92,6 +93,4 @@ class User extends Authenticatable
         return $this->belongsToMany(Rehearsal::class, 'user_rehearsal', 'user_id', 'rehearsal_id')
             ->withPivot('user_type');
     }
-
-
 }

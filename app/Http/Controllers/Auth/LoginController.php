@@ -19,7 +19,6 @@ class LoginController extends Controller
         // Intentar autenticar al usuario
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
 
-
             $user = Auth::user();
             $token = $user->createToken('API Token')->plainTextToken;
 
@@ -29,6 +28,7 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'Login correcto!',
                 'token' => $token,
+                'id' => $user->id,
                 'user_type' => $user->user_type,
                 'is_student' => $isStudent, // Devuelves si tiene estudiantes asociados
                 'role' => $user->role,
