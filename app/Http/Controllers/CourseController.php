@@ -10,15 +10,46 @@ class CourseController extends Controller
     public function index()
     {
         $user = auth()->user();
-        if ($user->user_type === 'teacher') {
-            
-            $courses = Course::where('user_id', $user->id)->with(['subject', 'instrument', 'user'])->get();
-            return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
-        }
 
-        $courses = Course::with(['subject', 'instrument', 'user'])->get();
-       // $courses = Course::all();
-        return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
+        if ($user->role === 'admin') {
+            // El admin tiene acceso a todos los cursos
+            $courses = Course::with(['subject', 'instrument', 'user'])->get();
+            return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
+        } elseif ($user->user_type === 'teacher') {
+            // El profesor tiene acceso a los cursos en los que imparte clases
+            $courses = Course::where('user_id', $user->id)
+                ->with(['subject', 'instrument'])
+                ->get();
+            return response()->json(['message' => 'Cursos del profesor recuperados correctamente', 'Courses' => $courses], 200);
+        } elseif ($user->user_type === 'member') {
+            $students = $user->students;
+
+            // $courses = collect();
+            $coursesByStudent = [];
+
+            foreach ($students as $student) {
+
+                $studentCourses = Course::whereHas('subject', function ($query) use ($student) {
+                    $query->whereHas('students', function ($query) use ($student) {
+                        $query->where('student_id', $student->id);
+                    });
+                })
+                    ->orWhereHas('instrument', function ($query) use ($student) {
+                        $query->whereHas('students', function ($query) use ($student) {
+                            $query->where('student_id', $student->id);
+                        });
+                    })
+                    ->with(['subject', 'instrument'])
+                    ->get();
+
+                $coursesByStudent[$student->id] = $studentCourses;
+                //$courses = $courses->merge($studentCourses);
+            }
+
+            return response()->json(['message' => 'Cursos por estudiante recuperados correctamente', 'Courses' => $coursesByStudent], 200);
+        } else {
+            return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
+        }
     }
 
     public function store(Request $request)

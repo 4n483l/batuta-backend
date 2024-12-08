@@ -10,12 +10,20 @@ class RehearsalController extends Controller
 {
     public function index()
     {
-        $rehearsals = Rehearsal::all();
-        return response()->json(['message' => 'Lista de ensayos recuperada correctamente', 'Rehearsals' => $rehearsals], 200);
+        $user = auth()->user();
+
+        if ($user->user_type === 'teacher' || $user->user_type === 'member' || $user->user_type === 'musician' || $user->role === 'admin') {
+            $rehearsals = Rehearsal::all();
+            return response()->json(['message' => 'Lista de ensayos recuperada correctamente', 'Rehearsals' => $rehearsals], 200);
+        } else {
+            return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
+        }
     }
 
     public function store(Request $request)
     {
+
+
         $validated = $request->validate([
 
             'place' => 'required|string|max:255',
@@ -27,7 +35,7 @@ class RehearsalController extends Controller
 
         return response()->json([
             'message' => 'Ensayo creado correctamente.',
-            'Rehearsal' => $rehearsal,
+            'rehearsal' => $rehearsal,
         ], 201);
     }
 
@@ -41,7 +49,7 @@ class RehearsalController extends Controller
         $rehearsal = Rehearsal::findOrFail($id);
 
         $validated = $request->validate([
-            
+
             'place' => 'required|string|max:255',
             'date' => 'required|date',
             'hour' => 'required|date_format:H:i',
@@ -57,6 +65,4 @@ class RehearsalController extends Controller
         $rehearsal->delete();
         return response()->json(['message' => 'Ensayo eliminado correctamente'], 200);
     }
-
-
 }

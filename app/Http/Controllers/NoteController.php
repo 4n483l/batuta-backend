@@ -4,16 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Note;
-use Illuminate\Support\Facades\Hash;
 
 class NoteController extends Controller
 {
-
-public function apuntes() {
-    $notes = Note::all();
-    return response()->json($notes);
-}
-
     public function index()
     {
         $user = auth()->user();
@@ -26,6 +19,7 @@ public function apuntes() {
             return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
         }
     }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,7 +37,7 @@ public function apuntes() {
 
         if ($request->hasFile('pdf')) {
             // Generar un nombre personalizado para el archivo PDF
-            $fileName = time(). '-' . $validated['title'] . '.pdf';
+            $fileName = time() . '-' . $validated['title'] . '.pdf';
             $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
         }
 
@@ -73,7 +67,8 @@ public function apuntes() {
         ], 200);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         $note = Note::findOrFail($id);
 
         $validated = $request->validate([
@@ -85,17 +80,17 @@ public function apuntes() {
             'pdf' => 'nullable|file'
         ]);
 
-    /*     if ($request->input('subject_id') && $request->input('instrument_id')) {
+        /*     if ($request->input('subject_id') && $request->input('instrument_id')) {
             return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
         } */
 
         if ($request->hasFile('pdf')) {
             // Generar un nombre personalizado para el archivo PDF
-            $fileName = time().  '-' . $validated['title']  .  '.pdf';
+            $fileName = time() .  '-' . $validated['title']  .  '.pdf';
             $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
         }
 
-  /*       $note->update([
+        /*       $note->update([
             'user_id' => auth()->id(),
             'title' => $validated['title'],
             'topic' => $validated['topic'],
@@ -219,5 +214,4 @@ public function apuntes() {
 
         return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
     }
-
 }

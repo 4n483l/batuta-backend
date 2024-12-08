@@ -25,61 +25,91 @@ use App\Http\Controllers\UserController;
 |
 */
 
-
+/* *** REGISTRO *** */
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 
-Route::apiResource('concerts', ConcertController::class);
+/* *** CONCIERTOS *** */
+Route::get('/concerts', [ConcertController::class, 'index']);
+Route::middleware('auth:sanctum')->apiResource( 'concerts', ConcertController::class)->except('index');
 
+/* *** ENSAYOS *** */
 Route::middleware('auth:sanctum')->apiResource('rehearsals', RehearsalController::class);
 
-/* Route::middleware('auth:sanctum')->get('/rehearsals', [RehearsalController::class, 'index']);
-Route::middleware('auth:sanctum')->post('/rehearsals', [RehearsalController::class, 'store']);
-Route::middleware('auth:sanctum')->get('/rehearsals/{id}', [RehearsalController::class, 'show']);
-Route::middleware('auth:sanctum')->put('/rehearsals/{id}', [RehearsalController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/rehearsals/{id}', [RehearsalController::class, 'destroy']); */
+/* *** EXÁMENES *** */
+Route::middleware('auth:sanctum')->apiResource('exams', ExamController::class);
 
-Route::middleware('auth:sanctum')->get('/exams', [ExamController::class, 'index']);
+/* Route::middleware('auth:sanctum')->get('/exams', [ExamController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/exams', [ExamController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/exams/{id}', [ExamController::class, 'show']);
 Route::middleware('auth:sanctum')->put('/exams/{id}', [ExamController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/exams/{id}', [ExamController::class, 'destroy']);
+Route::middleware('auth:sanctum')->delete('/exams/{id}', [ExamController::class, 'destroy']); */
 
-Route::middleware('auth:sanctum')->get('/courses', [CourseController::class, 'index']);
+/* *** CLASES *** */
+Route::middleware('auth:sanctum')->apiResource( 'courses', CourseController::class);
+
+/* Route::middleware('auth:sanctum')->get('/courses', [CourseController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/courses', [CourseController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/courses/{id}', [CourseController::class, 'show']);
 Route::middleware('auth:sanctum')->put('/courses/{id}', [CourseController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/courses/{id}', [CourseController::class, 'destroy']);
+Route::middleware('auth:sanctum')->delete('/courses/{id}', [CourseController::class, 'destroy']); */
 
-Route::middleware('auth:sanctum')->get('/subjects', [SubjectController::class, 'index']);
-Route::middleware('auth:sanctum')->post('/subjects', [SubjectController::class, 'store']);
-Route::middleware('auth:sanctum')->get('/subjects/{id}', [SubjectController::class, 'show']);
-Route::middleware('auth:sanctum')->put('/subjects/{id}', [SubjectController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/subjects/{id}', [SubjectController::class, 'destroy']);
+/* *** ASIGNATURAS *** */
+Route::middleware('auth:sanctum')->apiResource('subjects', SubjectController::class);
 
-Route::middleware('auth:sanctum')->get('/instruments', [InstrumentController::class, 'index']);
-Route::middleware('auth:sanctum')->post('/instruments', [InstrumentController::class, 'store']);
-Route::middleware('auth:sanctum')->get('/instruments/{id}', [InstrumentController::class, 'show']);
-Route::middleware('auth:sanctum')->put('/instruments/{id}', [InstrumentController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/instruments/{id}', [InstrumentController::class, 'destroy']);
+/* *** INSTRUMENTOS *** */
+Route::middleware('auth:sanctum')->apiResource('instruments', InstrumentController::class);
 
-Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
-Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
 
-Route::middleware('auth:sanctum')->get('/notes', [NoteController::class, 'index']);
+/* *** APUNTES *** */
+Route::middleware('auth:sanctum')->get('/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
+Route::middleware('auth:sanctum')->apiResource( 'notes', NoteController::class);
+
+/* Route::middleware('auth:sanctum')->get('/notes', [NoteController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/notes', [NoteController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/notes/{id}', [NoteController::class, 'show']);
 Route::middleware('auth:sanctum')->put('/notes/{id}', [NoteController::class, 'update']);
-Route::middleware('auth:sanctum')->delete('/notes/{id}', [NoteController::class, 'destroy']);
-Route::middleware('auth:sanctum')->get('/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
+Route::middleware('auth:sanctum')->delete('/notes/{id}', [NoteController::class, 'destroy']); */
 
 
-// garantiza que solo los usuarios autenticados puedan acceder a la ruta
-Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'index']);
-Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'students']);
+/* *** MATRICULA *** */
+Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
+
+/* *** USUARIOS *** */
+Route::middleware('auth:sanctum')->apiResource('users', UserController::class);
+
+Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'getStudentsAssociate']);
+
+/* *** ESTUDIANTES *** */
+Route::middleware('auth:sanctum')->get('/students', [UserController::class, 'indexStudents']);
+Route::middleware('auth:sanctum')->get('/students/{id}', [UserController::class, 'showStudent']);
+Route::middleware('auth:sanctum')->post('/students', [UserController::class, 'storeStudent']);
+Route::middleware('auth:sanctum')->put('/students/{id}', [UserController::class, 'updateStudent']);
+Route::middleware('auth:sanctum')->delete('/students/{id}', [UserController::class, 'destroyStudent']);
+
+
 
 Route::middleware('auth:sanctum')->get('/teacher/subjects', [SubjectController::class, 'getTeacherSubjects']);
 Route::middleware('auth:sanctum')->get('/teacher/instruments', [InstrumentController::class, 'getTeacherInstruments']);
+
+/* *** RUTAS PARA EL ADMIN *** */
+/* Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::apiResource('admin/concerts-admin', ConcertController::class);
+    Route::apiResource('admin/rehearsals', RehearsalController::class);
+    Route::apiResource('admin/exams', ExamController::class);
+    Route::apiResource('admin/courses', CourseController::class);
+    Route::apiResource('admin/subjects', SubjectController::class);
+    Route::apiResource('admin/instruments', InstrumentController::class);
+    Route::apiResource('admin/notes', NoteController::class);
+    Route::apiResource('admin/users', UserController::class);
+    Route::apiResource('admin/tuitions', TuitionController::class);
+
+    // Otras rutas específicas del administrador
+    Route::get('admin/teacher/subjects', [SubjectController::class, 'getTeacherSubjects']);
+    Route::get('admin/teacher/instruments', [InstrumentController::class, 'getTeacherInstruments']);
+});
+ */
 
 
 

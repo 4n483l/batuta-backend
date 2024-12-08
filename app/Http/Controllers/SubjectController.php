@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Subject;
-use App\Models\Instrument;
+
 
 class SubjectController extends Controller
 {
@@ -59,7 +59,7 @@ class SubjectController extends Controller
     public function getTeacherSubjects()
     {
         $user = auth()->user();
-        if ($user->user_type == 'teacher' || $user->user_type == 'admin') {
+        if ($user->user_type == 'teacher' || $user->role== 'admin') {
             $subjects = $user->subjects;
             return response()->json(['subjects' => $subjects], 200);
         }
@@ -69,7 +69,7 @@ class SubjectController extends Controller
     public function addTeacherSubject($subjectId, $teacherId)
     {
         $subject = Subject::findOrFail($subjectId);
-        $subject->users()->attach($teacherId, ['user_type' => 'teacher']); 
+        $subject->users()->attach($teacherId, ['user_type' => 'teacher']);
 
         return response()->json(['message' => 'Relación creada correctamente', 'subject' => $subject], 201);
     }
