@@ -81,6 +81,9 @@ Route::middleware('auth:sanctum')->apiResource('users', UserController::class);
 
 Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'getStudentsAssociate']);
 
+/* *** NAVBAR *** */
+Route::middleware('auth:sanctum')->get('/navbar', [UserController::class, 'getNavbar']);
+
 /* *** ESTUDIANTES *** */
 Route::middleware('auth:sanctum')->get('/students', [UserController::class, 'indexStudents']);
 Route::middleware('auth:sanctum')->get('/students/{id}', [UserController::class, 'showStudent']);

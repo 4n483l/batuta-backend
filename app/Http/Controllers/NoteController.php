@@ -143,23 +143,30 @@ class NoteController extends Controller
         if ($subjectIds->isEmpty() && $instrumentIds->isEmpty()) {
             return response()->json([
                 'message' => 'El profesor no tiene asignaturas ni instrumentos asociados.',
-                'notesTeacher' => []
+                'NotesTeacher' => []
             ], 200);
         }
-        $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
+        $notes = Note::with(['subject', 'instrument']) // Carga los datos relacionados
+            ->where(function ($query) use ($subjectIds, $instrumentIds) {
+                $query->whereIn('subject_id', $subjectIds)
+                    ->orWhereIn('instrument_id', $instrumentIds);
+            })
+            ->get();
+
+       /*  $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
             $query->whereIn('subject_id', $subjectIds)
                 ->orWhereIn('instrument_id', $instrumentIds);
-        })->get();
+        })->get(); */
 
         if ($notes->isEmpty()) {
             return response()->json([
                 'message' => 'No se encontraron apuntes asociados a las asignaturas o instrumentos del profesor.',
-                'notesTeacher' => []
+                'NotesTeacher' => []
             ], 200);
         }
         return response()->json([
             'message' => 'Apuntes del profesor recuperadas correctamente.',
-            'notesTeacher' => $notes
+            'NotesTeacher' => $notes
         ], 200);
     }
 
@@ -177,10 +184,12 @@ class NoteController extends Controller
                 continue; // si el estudiante no tiene asignaturas ni instrumentos, continuar con el siguiente estudiante
             }
 
-            $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
-                $query->whereIn('subject_id', $subjectIds)
-                    ->orWhereIn('instrument_id', $instrumentIds);
-            })->get();
+            $notes = Note::with(['subject', 'instrument']) // Carga los datos relacionados
+                ->where(function ($query) use ($subjectIds, $instrumentIds) {
+                    $query->whereIn('subject_id', $subjectIds)
+                        ->orWhereIn('instrument_id', $instrumentIds);
+                })
+                ->get();
 
             $studentNotes[$student->id] = $notes;
         }

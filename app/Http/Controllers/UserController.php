@@ -8,6 +8,11 @@ use App\Models\Student;
 
 class UserController extends Controller
 {
+    public function getNavbar(Request $request)
+    {
+        return $request->user();
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -19,6 +24,11 @@ class UserController extends Controller
         } elseif ($user->user_type === 'teacher') {
             $students = $user->students;
             return response()->json(['message' => 'Estudiantes del profesor recuperados correctamente', 'Students' => $students], 200);
+        }elseif ($user->user_type === 'musician'){
+            return response()->json([
+                'message' => 'Información del usuario autenticado',
+                'User' => $user
+            ], 200);
         } else {
             return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
         }
@@ -58,28 +68,35 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Valida los datos que llegan en la solicitud
+        // Validar solo los campos que pueden ser modificados
         $validated = $request->validate([
-            'name' => 'string|max:255',
-            'email' => 'string|email|max:255|unique:users',
-            //'password' => 'string|min:6|confirmed',
+            'name' => 'nullable|string|max:255',
+            'lastname' => 'nullable|string|max:255',
+            'dni' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'birth_date' => 'nullable|date',
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $id, // Validación de correo electrónico solo si se modifica
         ]);
 
-        // Verifica si el usuario existe
+        // Buscar el usuario a actualizar
         $user = User::find($id);
 
         if ($user) {
-            // Actualiza los datos del usuario
-            $user->name = $validated['name'] ?? $user->name;
-            $user->email = $validated['email'] ?? $user->email;
-            $user->password = isset($validated['password']) ? bcrypt($validated['password']) : $user->password;
-            $user->save();
+            // Actualizar los campos solo si se enviaron
+            $user->update($validated);
 
-            return response()->json($user, 200);
+            return response()->json([
+                'message' => 'Usuario actualizado correctamente',
+                'User' => $user
+            ], 200);
         }
 
-        return response()->json(['message' => 'Usuario no encontrado (store)'], 404);
-    }
+        return response()->json(['message' => 'Usuario no encontrado'], 404);
+}
+
 
     public function destroy($id)
     {
@@ -205,4 +222,11 @@ class UserController extends Controller
     {
         return $request->user()->students;
     }
+
+
+
+   /* public function students(Request $request)
+    {
+        return $request->user()->students;
+    } */
 }

@@ -28,3 +28,5 @@ class Instrument extends Model
         return $this->belongsToMany(Student::class, 'instrument_student', 'instrument_id', 'student_id');
     }
 }
+
+
