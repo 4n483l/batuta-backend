@@ -8,9 +8,9 @@ use App\Models\Student;
 
 class UserController extends Controller
 {
-    public function getNavbar(Request $request)
+    public function getNavbar()
     {
-        return $request->user();
+        return auth()->user();
     }
 
     public function index()
@@ -111,6 +111,26 @@ class UserController extends Controller
         return response()->json(['message' => 'Usuario no encontrado (destroy)'], 404);
     }
 
+    /* ******    PROFESORES   ******** */
+
+    public function indexTeachers()
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            $teachers = User::where('user_type', 'teacher')->get();
+            return response()->json([
+                'message' => 'Lista de profesores recuperada correctamente',
+                'Teachers' => $teachers
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'No tienes permisos para acceder a esta información.'
+            ], 403);
+    }
+}
+
+
 
     /* ******    ESTUDIANTES   ******** */
 
@@ -119,7 +139,7 @@ class UserController extends Controller
         $user = auth()->user();
 
         if ($user && $user->role === 'admin') {
-            $students = Student::with('user')->get(); // Devuelve todos los estudiantes con sus usuarios asociados
+            $students = Student::with('user')->get();
             return response()->json([
                 'message' => 'Lista de estudiantes recuperada correctamente',
                 'Students' => $students
@@ -150,14 +170,14 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'dni' => 'required|string|max:20',
+            'dni' => 'nullable|string|max:20',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'postal_code' => 'required|string|max:20',
             'birth_date' => 'required|date',
             'email' => 'required|string|email|max:255|unique:students',
-            'user_id' => 'required|exists:users,id', // Relación con el usuario
+            'user_id' => 'required|exists:users,id',
     ]);
 
         $student = Student::create($validated);
@@ -181,16 +201,12 @@ class UserController extends Controller
             'postal_code' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
             'email' => 'nullable|string|email|max:255|unique:students,email,' . $id,
-            'user_id' => 'nullable|exists:users,id', // Relación con el usuario
+            'user_id' => 'nullable|exists:users,id',
     ]);
         $student = Student::find($id);
 
         if ($student) {
             $student->update($validated);
-          /*   $student->name = $validated['name'] ?? $student->name;
-            $student->email = $validated['email'] ?? $student->email;
-            $student->user_id = $validated['user_id'] ?? $student->user_id;
-            $student->save(); */
 
             return response()->json([
                 'message' => 'Estudiante actualizado correctamente',
@@ -214,19 +230,10 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Estudiante no encontrado'], 404);
 }
-
-
-
     // Obtiene los estudiantes asociados al usuario autenticado
     public function getStudentsAssociate(Request $request)
     {
         return $request->user()->students;
     }
 
-
-
-   /* public function students(Request $request)
-    {
-        return $request->user()->students;
-    } */
 }

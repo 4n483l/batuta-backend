@@ -35,26 +35,31 @@ class NoteController extends Controller
             return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
         }
 
-        if ($request->hasFile('pdf')) {
+        if ($request->hasFile('pdf') && $request->file('pdf')->isValid()) {
             // Generar un nombre personalizado para el archivo PDF
-            $fileName = time() . '-' . $validated['title'] . '.pdf';
+            $fileName = time() . '-' . preg_replace('/[^a-zA-Z0-9]/', '-', $validated['title']) . '.pdf';
+
             $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
+
+            if (!$path) {
+                return response()->json(['message' => 'Error al guardar el archivo PDF.'], 500);
+            }
+
+            $note = Note::create([
+                'user_id' => auth()->id(),
+                'title' => $validated['title'],
+                'topic' => $validated['topic'],
+                'content' => $validated['content'],
+                'subject_id' => $validated['subject_id'] ?? null,
+                'instrument_id' => $validated['instrument_id'] ?? null,
+                'pdf' => $path ?? null
+            ]);
+
+            return response()->json([
+                'message' => 'Apunte creado exitosamente. Edite antes de guardar como PDF.',
+                'note' => $note
+            ], 201);
         }
-
-        $note = Note::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'topic' => $validated['topic'],
-            'content' => $validated['content'],
-            'subject_id' => $validated['subject_id'] ?? null,
-            'instrument_id' => $validated['instrument_id'] ?? null,
-            'pdf' => $path ?? null
-        ]);
-
-        return response()->json([
-            'message' => 'Apunte creado exitosamente. Edite antes de guardar como PDF.',
-            'note' => $note
-        ], 201);
     }
 
     public function show($id)
@@ -80,6 +85,7 @@ class NoteController extends Controller
             'pdf' => 'nullable|file'
         ]);
 
+
         /*     if ($request->input('subject_id') && $request->input('instrument_id')) {
             return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
         } */
@@ -90,7 +96,7 @@ class NoteController extends Controller
             $path = $request->file('pdf')->storeAs('notes', $fileName, 'public');
         }
 
-        /*       $note->update([
+              $note->update([
             'user_id' => auth()->id(),
             'title' => $validated['title'],
             'topic' => $validated['topic'],
@@ -98,9 +104,9 @@ class NoteController extends Controller
             'subject_id' => $validated['subject_id'] ?? null,
             'instrument_id' => $validated['instrument_id'] ?? null,
             'pdf' => $path ?? null
-        ]); */
+        ]);
 
-        $note->update($validated);
+       // $note->update($validated);
 
         return response()->json([
             'message' => 'Apunte actualizado exitosamente.',
@@ -153,7 +159,7 @@ class NoteController extends Controller
             })
             ->get();
 
-       /*  $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
+        /*  $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
             $query->whereIn('subject_id', $subjectIds)
                 ->orWhereIn('instrument_id', $instrumentIds);
         })->get(); */

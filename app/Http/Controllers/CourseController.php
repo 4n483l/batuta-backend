@@ -12,41 +12,11 @@ class CourseController extends Controller
         $user = auth()->user();
 
         if ($user->role === 'admin') {
-            // El admin tiene acceso a todos los cursos
-            $courses = Course::with(['subject', 'instrument', 'user'])->get();
-            return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
+            return $this->getCoursesForAdmin();
         } elseif ($user->user_type === 'teacher') {
-            // El profesor tiene acceso a los cursos en los que imparte clases
-            $courses = Course::where('user_id', $user->id)
-                ->with(['subject', 'instrument'])
-                ->get();
-            return response()->json(['message' => 'Cursos del profesor recuperados correctamente', 'Courses' => $courses], 200);
+            return $this->getCoursesForTeacher($user);
         } elseif ($user->user_type === 'member') {
-            $students = $user->students;
-
-            // $courses = collect();
-            $coursesByStudent = [];
-
-            foreach ($students as $student) {
-
-                $studentCourses = Course::whereHas('subject', function ($query) use ($student) {
-                    $query->whereHas('students', function ($query) use ($student) {
-                        $query->where('student_id', $student->id);
-                    });
-                })
-                    ->orWhereHas('instrument', function ($query) use ($student) {
-                        $query->whereHas('students', function ($query) use ($student) {
-                            $query->where('student_id', $student->id);
-                        });
-                    })
-                    ->with(['subject', 'instrument'])
-                    ->get();
-
-                $coursesByStudent[$student->id] = $studentCourses;
-                //$courses = $courses->merge($studentCourses);
-            }
-
-            return response()->json(['message' => 'Cursos por estudiante recuperados correctamente', 'Courses' => $coursesByStudent], 200);
+            return $this->getCoursesForStudent($user);
         } else {
             return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
         }
@@ -139,5 +109,83 @@ class CourseController extends Controller
         }
         $course->delete();
         return response()->json(['message' => 'Clase eliminada correctamente'], 200);
+    }
+
+    public function getCoursesForAdmin()
+    {
+        $courses = Course::with(['subject', 'instrument', 'user'])->get();
+        return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
+    }
+
+    private function getCoursesForTeacher($user)
+    {
+        $subjectIds = $user->subjects()->pluck('subjects.id');
+        $instrumentIds = $user->instruments()->pluck('instruments.id');
+
+        if ($subjectIds->isEmpty() && $instrumentIds->isEmpty()) {
+            return response()->json([
+                'message' => 'El profesor no tiene asignaturas ni instrumentos asociados a este curso.',
+                'CoursesTeacher' => []
+            ], 200);
+        }
+
+        $courses = Course::with(['subject', 'instrument', 'user'])
+            ->where('user_id', $user->id)
+            ->where(function ($query) use ($subjectIds, $instrumentIds) {
+                $query->whereIn('subject_id', $subjectIds)
+                    ->orWhereIn('instrument_id', $instrumentIds)
+                    ->orWhereNull('subject_id')
+                    ->orWhereNull('instrument_id');
+            })
+            ->get();
+
+        if ($courses->isEmpty()) {
+            return response()->json([
+                'message' => 'No se encontraron cursos asociados a las asignaturas o instrumentos del profesor.',
+                'CoursesTeacher' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Cursos del profesor recuperados correctamente.',
+            'CoursesTeacher' => $courses
+        ], 200);
+    }
+
+    private function getCoursesForStudent($user)
+    {
+        $students = $user->students()->get();
+        $studentCourses = [];
+
+        foreach ($students as $student) {
+            $subjectIds = $student->subjects()->pluck('subjects.id');
+            $instrumentIds = $student->instruments()->pluck('instruments.id');
+
+            // Si el estudiante no tiene asignaturas ni instrumentos, continuar con el siguiente estudiante
+            if ($subjectIds->isEmpty() && $instrumentIds->isEmpty()) {
+                continue;
+            }
+
+            $courses = Course::with(['subject', 'instrument'])
+                ->where(function ($query) use ($subjectIds, $instrumentIds) {
+                    $query->whereIn('subject_id', $subjectIds)
+                        ->orWhereIn('instrument_id', $instrumentIds);
+                })
+                ->get();
+
+            $studentCourses[$student->id] = $courses;
+        }
+
+        if (empty($studentCourses)) {
+            return response()->json([
+                'message' => 'No se encontraron cursos asociados a los estudiantes del miembro.',
+                'CoursesStudent' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Cursos del miembro recuperados correctamente.',
+            'CoursesStudent' => $studentCourses
+        ], 200);
     }
 }

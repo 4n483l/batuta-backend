@@ -77,7 +77,7 @@ class ExamController extends Controller
         if ($exams->isEmpty()) {
             return response()->json([
                 'message' => 'No se encontraron examenes de instrumento o asignatura del profesor.',
-                'EExamsTeacherxams' => []
+                'ExamsTeacherxams' => []
             ], 200);
         }
         return response()->json([
@@ -88,7 +88,6 @@ class ExamController extends Controller
 
     public function getExamsForStudents($user)
     {
-        // Obtener los estudiantes asociados al miembro
         $students = $user->students()->get();
         $studentExams = [];
 
