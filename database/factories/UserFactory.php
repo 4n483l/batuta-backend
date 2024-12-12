@@ -24,7 +24,7 @@ class UserFactory extends Factory
             'address' => $this->faker->address(),
             'city' => $this->faker->city(),
             'postal_code' => $this->faker->postcode(),
-            'role' => $this->faker->boolean(95) ? 'user' : 'admin',
+            'role' => 'user',
             'user_type' => $this->faker->randomElement(['teacher', 'musician', 'member']),
             'email_verified_at' => now(),
             //'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
@@ -32,6 +32,8 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
         ];
     }
+
+/*  'role' => $this->faker->boolean(95) ? 'user' : 'admin', */
 
     /**
      * Indicate that the model's email address should be unverified.

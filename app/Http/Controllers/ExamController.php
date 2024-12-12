@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
+use Illuminate\Http\Request;
 
 
 class ExamController extends Controller

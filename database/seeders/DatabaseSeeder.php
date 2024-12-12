@@ -26,6 +26,16 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
+        // ----------------- ADMIN -----------------------
+        User::factory()->create([
+            'name' => 'Paco',
+            'lastname' => 'Rovira',
+            'email' => 'admin@example.com',
+            'role' => 'admin',
+            'user_type' => 'admin',
+            'password' => bcrypt('example'),
+        ]);
+
 
         // ----------------- USERS -----------------------
 
@@ -42,10 +52,18 @@ class DatabaseSeeder extends Seeder
         Concert::factory(10)->create();
 
         // ----------------- SUBJECTS-----------------
-        $subjects = Subject::factory(3)->create();
+        $subjectNames = ['Lenguaje Musical', 'Jardín Musical', 'Canto vocal'];
+        $subjects = collect($subjectNames)->map(function ($name) {
+            return Subject::factory()->create(['name' => $name]);
+        });
+        // $subjects = Subject::factory(3)->create();
 
         // ----------------- INSTRUMENTS -----------------
-        $instruments = Instrument::factory(3)->create();
+        $instrumentNames = ['Clarinete',  'Saxofón', 'Flauta', 'Trompeta', 'Trompa', 'Piano', 'Guitarra', 'Violín', 'Percusión','Trombón', 'Tuba', 'Bombardino', 'Contrabajo', 'Violonchelo', 'Acordeón', 'Armónica'];
+        $instruments = collect($instrumentNames)->map(function ($name) {
+            return Instrument::factory()->create(['name' => $name]);
+        });
+       // $instruments = Instrument::factory(3)->create();
 
         // -----------------  EXAMS -----------------
         Exam::factory(10)->create();
@@ -59,18 +77,18 @@ class DatabaseSeeder extends Seeder
 
         // ----------- INSTRUMENT-MUSICIAN -----------------
         $musicians->each(function ($musician) use ($instruments) {
-            $randomInstrument = $instruments->random();
-            $musician->instruments()->attach($randomInstrument->id, ['user_type' => 'musician']);
+           // $randomInstrument = $instruments->random();
+            $musician->instruments()->attach( $instruments->random()->id, ['user_type' => 'musician']);
         });
         // ----------- INSTRUMENT-TEACHER-----------------
         $teachers->each(function ($teacher) use ($instruments) {
-            $randomInstrument = $instruments->random();
-            $teacher->instruments()->attach($randomInstrument->id, ['user_type' => 'teacher']);
+           // $randomInstrument = $instruments->random();
+            $teacher->instruments()->attach( $instruments->random()->id, ['user_type' => 'teacher']);
         });
 
 
         //----------------- STUDENTS -----------------
-        $members->each(function ($member) use ($instruments, $subjects) {
+            $members->each(function ($member) use ($instruments, $subjects) {
             // Decidir aleatoriamente si este miembro tendrá estudiantes(1 o 2 Students)
             $numberOfStudents = rand(0, 2);
             if ($numberOfStudents > 0) {
@@ -90,10 +108,11 @@ class DatabaseSeeder extends Seeder
             }
         });
 
+
         // ----------------- TEACHER-SUBJECT -----------------
         $teachers->each(function ($teacher) use ($subjects, $instruments) {
             // Seleccionar 2 asignaturas aleatorias para el teacher
-            $randomSubjects = $subjects->random(2);
+            $randomSubjects = $subjects->random(1,2);
             $randomInstrument = $instruments->random();
 
             $teacher->subjects()->attach(
@@ -102,16 +121,20 @@ class DatabaseSeeder extends Seeder
             );
             $teacher->instruments()->attach($randomInstrument->id, ['user_type' => 'teacher']);
 
-     
+
         });
 
 
         // ----------------- USER-REHEARSAL -----------------
-        User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
+        $musicians->each(function ($musician) use ($rehearsals) {
+            $musician->rehearsals()->attach($rehearsals->random(5)->pluck('id')->toArray());
+        });
+
+   /*      User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
             $user->rehearsals()->attach(
                 $rehearsals->random(5)->pluck('id')->toArray()
             );
-        });
+        }) */;
 
 
 
