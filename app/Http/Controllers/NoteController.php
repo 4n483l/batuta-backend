@@ -85,11 +85,6 @@ class NoteController extends Controller
             'pdf' => 'nullable|file'
         ]);
 
-
-        /*     if ($request->input('subject_id') && $request->input('instrument_id')) {
-            return response()->json(['message' => 'No se puede asignar un apunte a una asignatura e instrumento al mismo tiempo.'], 400);
-        } */
-
         if ($request->hasFile('pdf')) {
             // Generar un nombre personalizado para el archivo PDF
             $fileName = time() .  '-' . $validated['title']  .  '.pdf';
@@ -122,24 +117,6 @@ class NoteController extends Controller
         return response()->json(['message' => 'Apunte eliminado correctamente.'], 200);
     }
 
-
-    /*     public function getNotesForAdmin()
-    {
-        $user = auth()->user();
-
-        if ($user->role === 'admin') {
-            $notes = Note::all();
-
-            return response()->json([
-                'message' => 'Lista de apuntes recuperada correctamente.',
-                'notes' => $notes
-            ], 200);
-        }
-
-        return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
-    } */
-
-
     private function getTeacherNotes($user)
     {
         // Obtener IDs de asignaturas e instrumentos relacionados al teacher
@@ -158,11 +135,6 @@ class NoteController extends Controller
                     ->orWhereIn('instrument_id', $instrumentIds);
             })
             ->get();
-
-        /*  $notes = Note::where(function ($query) use ($subjectIds, $instrumentIds) {
-            $query->whereIn('subject_id', $subjectIds)
-                ->orWhereIn('instrument_id', $instrumentIds);
-        })->get(); */
 
         if ($notes->isEmpty()) {
             return response()->json([
@@ -190,7 +162,7 @@ class NoteController extends Controller
                 continue; // si el estudiante no tiene asignaturas ni instrumentos, continuar con el siguiente estudiante
             }
 
-            $notes = Note::with(['subject', 'instrument']) // Carga los datos relacionados
+            $notes = Note::with(['subject', 'instrument'])
                 ->where(function ($query) use ($subjectIds, $instrumentIds) {
                     $query->whereIn('subject_id', $subjectIds)
                         ->orWhereIn('instrument_id', $instrumentIds);
@@ -211,7 +183,7 @@ class NoteController extends Controller
             'notesStudent' => $studentNotes
         ], 200);
     }
-
+/*
     public function getSubjectsAndInstruments()
     {
         $user = auth()->user();
@@ -228,5 +200,5 @@ class NoteController extends Controller
         }
 
         return response()->json(['message' => 'El usuario no tiene permiso para ver esta información.'], 403);
-    }
+    } */
 }

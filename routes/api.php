@@ -49,7 +49,7 @@ Route::middleware('auth:sanctum')->apiResource('subjects', SubjectController::cl
 Route::middleware('auth:sanctum')->apiResource('instruments', InstrumentController::class);
 
 /* *** APUNTES *** */
-Route::middleware('auth:sanctum')->get('/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
+ Route::middleware('auth:sanctum')->get('/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
 Route::middleware('auth:sanctum')->apiResource('notes', NoteController::class);
 
 /* *** MATRICULA *** */
