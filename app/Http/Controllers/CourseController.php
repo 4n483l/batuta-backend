@@ -24,7 +24,6 @@ class CourseController extends Controller
 
     public function store(Request $request)
     {
-        // Validar los datos de entrada
         $validated = $request->validate([
             'subject_id' => 'nullable|exists:subjects,id',
             'instrument_id' => 'nullable|exists:instruments,id',
@@ -34,17 +33,13 @@ class CourseController extends Controller
             'classroom' => 'nullable|string|max:255',
         ]);
 
-        // Validar la restricción: al menos uno entre subject_id o instrument_id debe estar presente
-        if (is_null($validated['subject_id']) && is_null($validated['instrument_id'])) {
+        // validar que al menos uno de los campos no esté vacío
+        if (is_null($validated['subject_id']) === is_null($validated['instrument_id'])) {
             return response()->json([
                 'message' => 'Debe proporcionar subject_id o instrument_id, pero no ambos a la vez.'
             ], 422);
         }
-        if (!is_null($validated['subject_id']) && !is_null($validated['instrument_id'])) {
-            return response()->json([
-                'message' => 'Debe proporcionar subject_id o instrument_id, pero no ambos a la vez.'
-            ], 422);
-        }
+
         $course = Course::create($validated);
 
         return response()->json([
@@ -80,14 +75,8 @@ class CourseController extends Controller
             'classroom' => 'nullable|string|max:255',
         ]);
 
-        // Validar la restricción: al menos uno entre subject_id o instrument_id debe estar presente
-        if (is_null($validated['subject_id']) && is_null($validated['instrument_id'])) {
-            return response()->json([
-                'message' => 'Debe proporcionar subject_id o instrument_id, pero no ambos a la vez.'
-            ], 422);
-        }
-
-        if (!is_null($validated['subject_id']) && !is_null($validated['instrument_id'])) {
+        // Validar que al menos uno de los campos no esté vacío
+        if (is_null($validated['subject_id']) === is_null($validated['instrument_id'])) {
             return response()->json([
                 'message' => 'Debe proporcionar subject_id o instrument_id, pero no ambos a la vez.'
             ], 422);
@@ -114,6 +103,11 @@ class CourseController extends Controller
     public function getCoursesForAdmin()
     {
         $courses = Course::with(['subject', 'instrument', 'user'])->get();
+
+        if ($courses->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron clases.', 'Courses' => []], 200);
+        }
+
         return response()->json(['message' => 'Lista de clases recuperada correctamente', 'Courses' => $courses], 200);
     }
 

@@ -7,8 +7,6 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
-use App\Models\Rehearsal;
-use App\Models\Concert;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Note;
@@ -26,93 +24,43 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
-        // ----------------- ADMIN -----------------------
-        User::factory()->create([
-            'name' => 'Paco',
-            'lastname' => 'Rovira',
-            'email' => 'admin@example.com',
-            'role' => 'admin',
-            'user_type' => 'admin',
-            'password' => bcrypt('example'),
+
+        $this->call([
+            UserSeeder::class,
+            ConcertSeeder::class,
+            RehearsalSeeder::class,
         ]);
-
-
-        // ----------------- USERS -----------------------
-
-        $musicians = User::factory(5)->create(['user_type' => 'musician']);
-        $teachers = User::factory(5)->create(['user_type' => 'teacher']);
-        $members = User::factory(5)->create(['user_type' => 'member']);
-
-        $users = $musicians->concat($teachers)->concat($members);
-
-        // ----------------- REHEARSALS -----------------
-        $rehearsals = Rehearsal::factory(20)->create();
-
-        // ----------------- CONCERTS-----------------
-        Concert::factory(10)->create();
 
         // ----------------- SUBJECTS-----------------
         $subjectNames = ['Lenguaje Musical', 'Jardín Musical', 'Canto vocal'];
         $subjects = collect($subjectNames)->map(function ($name) {
-            return Subject::factory()->create(['name' => $name]);
+            return Subject::create(['name' => $name]);
         });
-        // $subjects = Subject::factory(3)->create();
 
         // ----------------- INSTRUMENTS -----------------
-        $instrumentNames = ['Clarinete',  'Saxofón', 'Flauta', 'Trompeta', 'Trompa', 'Piano', 'Guitarra', 'Violín', 'Percusión','Trombón', 'Tuba', 'Bombardino', 'Contrabajo', 'Violonchelo', 'Acordeón', 'Armónica'];
+        $instrumentNames = ['Trompa', 'Saxofón', 'Clarinete', 'Flauta', 'Trompeta', 'Piano', 'Guitarra', 'Violín', 'Percusión', 'Trombón', 'Tuba', 'Bombardino', 'Contrabajo', 'Violonchelo', 'Acordeón', 'Armónica'];
         $instruments = collect($instrumentNames)->map(function ($name) {
-            return Instrument::factory()->create(['name' => $name]);
+            return Instrument::create(['name' => $name]);
         });
-       // $instruments = Instrument::factory(3)->create();
-
-        // -----------------  EXAMS -----------------
-        Exam::factory(10)->create();
-
-        // ---------------- COURSES -----------------
-        Course::factory(10)->create();
-
-        // ----------------- NOTES -----------------
-        Note::factory(1)->create();
-
 
         // ----------- INSTRUMENT-MUSICIAN -----------------
+        $musicians = User::where('user_type', 'musician')->get();
+
         $musicians->each(function ($musician) use ($instruments) {
-           // $randomInstrument = $instruments->random();
-            $musician->instruments()->attach( $instruments->random()->id, ['user_type' => 'musician']);
+            $musician->instruments()->attach($instruments->random()->id, ['user_type' => 'musician']);
         });
+
         // ----------- INSTRUMENT-TEACHER-----------------
+        $teachers = User::where('user_type', 'teacher')->get();
         $teachers->each(function ($teacher) use ($instruments) {
-           // $randomInstrument = $instruments->random();
-            $teacher->instruments()->attach( $instruments->random()->id, ['user_type' => 'teacher']);
+            // $randomInstrument = $instruments->random();
+            $teacher->instruments()->attach($instruments->random()->id, ['user_type' => 'teacher']);
         });
-
-
-        //----------------- STUDENTS -----------------
-            $members->each(function ($member) use ($instruments, $subjects) {
-            // Decidir aleatoriamente si este miembro tendrá estudiantes(1 o 2 Students)
-            $numberOfStudents = rand(0, 2);
-            if ($numberOfStudents > 0) {
-                $students = Student::factory($numberOfStudents)->create([
-                    'user_id' => $member->id, // Asignar el id del miembro
-                ]);
-
-                // Asociar instrumentos y asignaturas a los students
-                $students->each(function ($student) use ($instruments, $subjects) {
-                    // Asignar un instrumento aleatorio al student
-                    $randomInstrument = $instruments->random();
-                    $student->instruments()->attach($randomInstrument->id);
-
-                    $randomSubjects = $subjects->random(rand(1, 2));
-                    $student->subjects()->attach($randomSubjects->pluck('id')->toArray());
-                });
-            }
-        });
-
 
         // ----------------- TEACHER-SUBJECT -----------------
         $teachers->each(function ($teacher) use ($subjects, $instruments) {
             // Seleccionar 2 asignaturas aleatorias para el teacher
-            $randomSubjects = $subjects->random(1,2);
+            $randomSubjects = $subjects->random(rand(1, 2));
             $randomInstrument = $instruments->random();
 
             $teacher->subjects()->attach(
@@ -120,34 +68,200 @@ class DatabaseSeeder extends Seeder
                 ['user_type' => 'teacher']
             );
             $teacher->instruments()->attach($randomInstrument->id, ['user_type' => 'teacher']);
-
-
         });
 
 
-        // ----------------- USER-REHEARSAL -----------------
-        $musicians->each(function ($musician) use ($rehearsals) {
-            $musician->rehearsals()->attach($rehearsals->random(5)->pluck('id')->toArray());
-        });
+        //----------------- STUDENTS -----------------
 
-   /*      User::where('user_type', 'musician')->each(function ($user) use ($rehearsals) {
-            $user->rehearsals()->attach(
-                $rehearsals->random(5)->pluck('id')->toArray()
-            );
-        }) */;
+        $studentsData = [
+            [
+                'name' => 'Alba',
+                'lastname' => 'Navarro Verde',
+                'phone' => '555444777',
+                'address' => 'Calle Menor, 7',
+                'city' => 'Benidorm',
+                'postal_code' => '03500',
+                'birth_date' => '2020-03-02',
+                'email' => 'student1@example.com',
+
+            ],
+            [
+                'name' => 'Irina',
+                'lastname' => 'Jiganie',
+                'phone' => '553444777',
+                'address' => 'Calle Almedia, 45',
+                'city' => 'Callosa',
+                'postal_code' => '03510',
+                'birth_date' => '2017-07-26',
+                'email' => 'student2@example.com',
+
+            ],
+            [
+                'name' => 'Marcos',
+                'lastname' => 'Ferrer Torralbo',
+                'phone' => '555444779',
+                'address' => 'Calle Alamo, 7',
+                'city' => 'Benidorm',
+                'postal_code' => '03500',
+                'birth_date' => '2021-06-02',
+                'email' => 'student3@example.com',
+
+            ],
+            [
+                'name' => 'Manuela',
+                'lastname' => 'Ferrer Ferrer',
+                'phone' => '525444779',
+                'address' => 'Calle Corazon, 7',
+                'city' => 'Benidorm',
+                'postal_code' => '03500',
+                'birth_date' => '2015-10-25',
+                'email' => 'student4@example.com',
+
+            ],
+            [
+                'name' => 'Doris',
+                'lastname' => 'Stutgart',
+                'phone' => '555844779',
+                'address' => 'Calle Paseo, 21',
+                'city' => 'Benidorm',
+                'postal_code' => '03500',
+                'birth_date' => '1985-06-14',
+                'email' => 'student5@example.com',
+
+            ]
+                ];
+
+
+        $studentsCollection = collect($studentsData); // Convertir el array en una colección
+        $members = User::where('user_type','member')->  get();
+
+        $members->each(function ($member) use ($studentsCollection, $instruments, $subjects) {
+            $numberOfStudents = rand(0, 2);
+
+            // Elimina los estudiantes de la colección y los guarda en una nueva colección
+            $studentsForMember = $studentsCollection->splice(0, $numberOfStudents);
+
+            $studentsForMember->each(function ($studentData) use ($member, $instruments, $subjects) {
+                // Crear el estudiante asociado al miembro
+                $student = Student::create(array_merge($studentData, [
+                    'user_id' => $member->id,
+                ]));
+
+                // Asignar un instrumento aleatorio al estudiante
+                $randomInstrument = $instruments->random();
+                $student->instruments()->attach($randomInstrument->id);
+
+                // Asignar 1 o 2 asignaturas aleatorias al estudiante
+                $randomSubjects = $subjects->random(rand(1, 2));
+                $student->subjects()->attach($randomSubjects->pluck('id')->toArray());
+    });
+});
 
 
 
+        // -----------------  EXAMS ----------------
+
+        for ($i = 0; $i < 10; $i++) {
+
+            $teacher = $teachers->random();
+            $isSubjectExam = rand(0, 1) == 0;
+
+            if ($isSubjectExam) {
+                $subject = $subjects->random();
+                Exam::create([
+                    'subject_id' => $subject->id,
+                    'user_id' => $teacher->id,
+                    'instrument_id' => null,
+                    'date' => $this->generateRandomDate(),
+                    'hour' => $this->generateRandomHour(),
+                    'classroom' => $this->generateRandomClassroom(),
+                ]);
+            } else {
+                $instrument = $instruments->random();
+                Exam::create([
+                    'subject_id' => null,
+                    'user_id' => $teacher->id,
+                    'instrument_id' => $instrument->id,
+                    'date' => $this->generateRandomDate(),
+                    'hour' => $this->generateRandomHour(),
+                    'classroom' => $this->generateRandomClassroom(),
+                ]);
+            }
+        }
+
+        // ---------------- COURSES -----------------
+        for ($i = 0; $i < 10; $i++) {
+
+            $teacher = $teachers->random();
+            $isSubjectCourse = rand(0, 1) == 0;
+
+            if ( $isSubjectCourse) {
+                $subject = $subjects->random();
+                Course::create([
+                    'subject_id' => $subject->id,
+                    'user_id' => $teacher->id,
+                    'instrument_id' => null,
+                    'date' => $this->generateRandomDate(),
+                    'hour' => $this->generateRandomHour(),
+                    'classroom' => $this->generateRandomClassroom(),
+                ]);
+            } else {
+                $instrument = $instruments->random();
+                Course::create([
+                    'subject_id' => null,
+                    'user_id' => $teacher->id,
+                    'instrument_id' => $instrument->id,
+                    'date' => $this->generateRandomDate(),
+                    'hour' => $this->generateRandomHour(),
+                    'classroom' => $this->generateRandomClassroom(),
+                ]);
+            }
+        }
+
+        // ----------------- NOTES -----------------
+
+
+        for ($i = 0; $i < 10; $i++) {
+
+            $teacher = $teachers->random();
+
+            // Aleatoriamente seleccionar si el apunte tendrá un subject_id o un instrument_id
+            $subject = $subjects->isNotEmpty() ? $subjects->random() : null;
+            $instrument = $instruments->isNotEmpty() ? $instruments->random() : null;
+
+            // Asegurarse de que solo uno de los dos esté presente
+            if ($subject && $instrument) {
+                $instrument = null; // Eliminar instrumento si ya hay un subject
+            }
+            // Crear el apunte
+            Note::create([
+                'title' => 'Apunte ' . ($i + 1),
+                'topic' => 'Tema ' . rand(1, 5), // Tema aleatorio
+                'content' => 'Contenido del apunte para el tema ' . rand(1, 5),
+                'user_id' => $teacher->id,
+                'subject_id' => $subject ? $subject->id : null,
+                'instrument_id' => $instrument ? $instrument->id : null,
+                'pdf' => null, 
+            ]);
+        }
 
 
 
+    }
 
-        //crea datos a nivel memoria sin guardar en sql
-        //  \App\Models\User::factory(10)->make();
-        // \App\Models\Concert::factory(10)->make();
-        // \App\Models\Rehearsal::factory(10)->make();
-        // \App\Models\Course::factory(10)->make();
-        //\App\Models\Exam::factory(10)->make();
-        // \App\Models\Note::factory(10)->make();
+    private function generateRandomDate()
+    {
+        // Generar una fecha aleatoria dentro de los próximos 3 meses
+        return now()->addDays(rand(1, 90))->format('Y-m-d');
+    }
+    private function generateRandomHour()
+    {
+        // Generar una hora aleatoria entre 15:00 y 20:00
+        return rand(15, 20) . ':' . str_pad(rand(0, 59), 2, '0', STR_PAD_LEFT);
+    }
+    private function generateRandomClassroom()
+    {
+        $classrooms = ['Aula 101', 'Aula 102', 'Aula 103', 'Sala 1', 'Sala 2'];
+        return $classrooms[array_rand($classrooms)];
     }
 }

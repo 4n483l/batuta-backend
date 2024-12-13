@@ -15,7 +15,7 @@ class CreateRehearsalsTable extends Migration
     { // ensayos
         Schema::create('rehearsals', function (Blueprint $table) {
             $table->id();
-            $table->enum('place', ['auditorium', 'rehearsal room'])->default('rehearsal room');
+            $table->enum('place', ['Auditorio', 'Sala de ensayo'])->default('Auditorio');
            // $table->string('place');
             $table->date('date');
             $table->string('hour');

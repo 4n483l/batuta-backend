@@ -28,7 +28,6 @@ class CreateUsersTable extends Migration
             $table->enum('user_type', ['teacher', 'musician', 'member', 'admin'])->default('member');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            // $table->foreignId('user_id')->nullable(); // relacion de socio-alumno
             $table->rememberToken();
             $table->timestamps();
         });

@@ -50,18 +50,15 @@ Route::middleware('auth:sanctum')->apiResource('instruments', InstrumentControll
 
 /* *** APUNTES *** */
 Route::middleware('auth:sanctum')->get('/notes/subjectInstrument', [NoteController::class, 'getSubjectsAndInstruments']);
-
 Route::middleware('auth:sanctum')->apiResource('notes', NoteController::class);
-
 
 /* *** MATRICULA *** */
 Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
 
 /* *** USUARIOS *** */
-Route::middleware('auth:sanctum')->apiResource('users', UserController::class);
-
 Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'getStudentsAssociate']);
+Route::middleware('auth:sanctum')->apiResource('users', UserController::class);
 
 /* *** NAVBAR *** */
 Route::middleware('auth:sanctum')->get('/navbar', [UserController::class, 'getNavbar']);
@@ -75,7 +72,6 @@ Route::middleware('auth:sanctum')->delete('/students/{id}', [UserController::cla
 
 /* *** PROFESORES *** */
 Route::middleware('auth:sanctum')->get('/teachers', [UserController::class, 'indexTeachers']);
-
 
 Route::middleware('auth:sanctum')->get('/teacher/subjects', [SubjectController::class, 'getTeacherSubjects']);
 Route::middleware('auth:sanctum')->get('/teacher/instruments', [InstrumentController::class, 'getTeacherInstruments']);
