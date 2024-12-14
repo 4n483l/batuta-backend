@@ -28,10 +28,12 @@ class TuitionController extends Controller
             'postal_code' => 'nullable|string|max:5',
             'birth_date' => 'required|date',
             'email' => 'required|email',
-            'subjects' => 'required|array', 
+            'subjects' => 'required|array',
             'subjects.*' => 'exists:subjects,id',
             'instrument' => 'required|string|max:255',
         ]);
+
+
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), ], 422);
@@ -89,8 +91,10 @@ class TuitionController extends Controller
         ]);
 
         $student->subjects()->syncWithoutDetaching($validatedData['subjects']);
+        $instrumentName = strval($validatedData['instrument']);
         $student->instruments()->syncWithoutDetaching([
-            'name' => $validatedData['instrument']
+            'name' => $instrumentName
+            //'name' => $validatedData['instrument']
         ]);
 
         return response()->json([
