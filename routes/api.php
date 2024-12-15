@@ -53,8 +53,9 @@ Route::middleware('auth:sanctum')->apiResource('instruments', InstrumentControll
 Route::middleware('auth:sanctum')->apiResource('notes', NoteController::class);
 
 /* *** MATRICULA *** */
-Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/tuitions', [TuitionController::class, 'show']);
+Route::middleware('auth:sanctum')->post('/tuitions', [TuitionController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/admin/tuitions', [TuitionController::class, 'index']);
 
 /* *** USUARIOS *** */
 Route::middleware('auth:sanctum')->get('/user/students', [UserController::class, 'getStudentsAssociate']);

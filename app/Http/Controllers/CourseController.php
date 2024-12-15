@@ -118,24 +118,22 @@ class CourseController extends Controller
 
         if ($subjectIds->isEmpty() && $instrumentIds->isEmpty()) {
             return response()->json([
-                'message' => 'El profesor no tiene asignaturas ni instrumentos asociados a este curso.',
+                'message' => 'El profesor no tiene asignaturas ni instrumentos asociados.',
                 'CoursesTeacher' => []
             ], 200);
         }
 
         $courses = Course::with(['subject', 'instrument', 'user'])
-            ->where('user_id', $user->id)
             ->where(function ($query) use ($subjectIds, $instrumentIds) {
+
                 $query->whereIn('subject_id', $subjectIds)
-                    ->orWhereIn('instrument_id', $instrumentIds)
-                    ->orWhereNull('subject_id')
-                    ->orWhereNull('instrument_id');
+                    ->orWhereIn('instrument_id', $instrumentIds);
             })
             ->get();
 
         if ($courses->isEmpty()) {
             return response()->json([
-                'message' => 'No se encontraron cursos asociados a las asignaturas o instrumentos del profesor.',
+                'message' => 'No se encontraron cursos asociados al profesor.',
                 'CoursesTeacher' => []
             ], 200);
         }
@@ -145,7 +143,6 @@ class CourseController extends Controller
             'CoursesTeacher' => $courses
         ], 200);
     }
-
     private function getCoursesForStudent($user)
     {
         $students = $user->students()->get();

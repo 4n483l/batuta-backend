@@ -130,13 +130,10 @@ class ExamController extends Controller
             ], 200);
         }
 
-        $exams = Exam::with('subject', 'instrument', 'user')
-            ->where('user_id', $user->id)
+        $exams = Exam::with(['subject', 'instrument', 'user'])
             ->where(function ($query) use ($subjectIds, $instrumentIds) {
                 $query->whereIn('subject_id', $subjectIds)
-                    ->orWhereIn('instrument_id', $instrumentIds)
-                    ->orWhereNull('subject_id')
-                    ->orWhereNull('instrument_id');
+                    ->orWhereIn('instrument_id', $instrumentIds);
             })
             ->get();
 
