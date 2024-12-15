@@ -10,6 +10,24 @@ use App\Models\User;
 
 class TuitionController extends Controller
 {
+
+    public function index()
+    {
+        $authenticatedUser = Auth::user();
+
+        if ($authenticatedUser->user_type !== 'admin') {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        $students = Student::all();
+
+        return response()->json([
+            'message' => 'Lista de estudiantes.',
+            'Estudiantes' => $students
+        ], 200);
+    }
+
+
     public function store(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -28,12 +46,10 @@ class TuitionController extends Controller
             'postal_code' => 'nullable|string|max:5',
             'birth_date' => 'required|date',
             'email' => 'required|email',
-            'subjects' => 'required|array',
+            'subjects' => 'nullable|array',
             'subjects.*' => 'exists:subjects,id',
-            'instrument' => 'required|string|max:255',
+            'instrument' => 'required|integer|max:255',
         ]);
-
-
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), ], 422);
@@ -87,24 +103,33 @@ class TuitionController extends Controller
             'postal_code' => $validatedData['postal_code'],
             'birth_date' => $validatedData['birth_date'],
             'email' => $validatedData['email'],
-            'user_id' => $authenticatedUser->id, // foreign key al miembro autenticado
+            'user_id' => $authenticatedUser->id,
         ]);
 
         $student->subjects()->syncWithoutDetaching($validatedData['subjects']);
-        $instrumentName = strval($validatedData['instrument']);
-        $student->instruments()->syncWithoutDetaching([
-            'name' => $instrumentName
-            //'name' => $validatedData['instrument']
+
+
+
+        /*      $student->instruments()->syncWithoutDetaching([
+
+            'name' => $validatedData['instrument']
         ]);
+ */
+
+
+        $student->instruments()->syncWithoutDetaching([$validatedData['instrument']]);
+
+
 
         return response()->json([
             'message' => 'Matrícula creada exitosamente.',
             'data' => [
-                'student' => $student,
+            'student' => $student,
             ]
         ], 201);
     }
 
+    // muestra los datos del usuario autenticado para rellenar matricula en frontend
     public function show()
     {
         $user = Auth::user();
