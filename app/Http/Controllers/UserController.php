@@ -78,7 +78,8 @@ class UserController extends Controller
             'city' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
-            'email' => 'nullable|string|email|max:255|unique:users,email,' . $id, // Validación de correo electrónico solo si se modifica
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $id,
+            'user_type' => 'nullable|string|in:musician,member,teacher',
         ]);
 
         // Buscar el usuario a actualizar
@@ -96,6 +97,10 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario no encontrado'], 404);
 }
+
+
+
+
 
 
     public function destroy($id)
