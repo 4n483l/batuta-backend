@@ -176,7 +176,7 @@ class UserController extends Controller
             'city' => 'required|string|max:255',
             'postal_code' => 'required|string|max:20',
             'birth_date' => 'required|date',
-            'email' => 'required|string|email|max:255|unique:students',
+            'email' => 'required|string|email|max:255',
             'user_id' => 'required|exists:users,id',
     ]);
 
@@ -200,7 +200,7 @@ class UserController extends Controller
             'city' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
-            'email' => 'nullable|string|email|max:255|unique:students,email,' . $id,
+            'email' => 'nullable|string|email|max:255,' . $id,
             'user_id' => 'nullable|exists:users,id',
     ]);
         $student = Student::find($id);
